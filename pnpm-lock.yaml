@@ -26,6 +26,12 @@ importers:
       '@angular/router':
         specifier: ^21.2.0
         version: 21.2.8(@angular/common@21.2.8(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2))(@angular/platform-browser@21.2.8(@angular/common@21.2.8(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2)))(rxjs@7.8.2)
+      '@webgpu/types':
+        specifier: ^0.1.69
+        version: 0.1.69
+      lucide-angular:
+        specifier: ^1.0.0
+        version: 1.0.0(@angular/common@21.2.8(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2))
       rxjs:
         specifier: ~7.8.0
         version: 7.8.2
@@ -1431,6 +1437,9 @@ packages:
   '@vitest/utils@4.1.4':
     resolution: {integrity: sha512-13QMT+eysM5uVGa1rG4kegGYNp6cnQcsTc67ELFbhNLQO+vgsygtYJx2khvdt4gVQqSSpC/KT5FZZxUpP3Oatw==}
 
+  '@webgpu/types@0.1.69':
+    resolution: {integrity: sha512-RPmm6kgRbI8e98zSD3RVACvnuktIja5+yLgDAkTmxLr90BEwdTXRQWNLF3ETTTyH/8mKhznZuN5AveXYFEsMGQ==}
+
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
 
@@ -2103,6 +2112,12 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  lucide-angular@1.0.0:
+    resolution: {integrity: sha512-YxCNEXHUz2IzAZIlxU4CkD55ljMjOlm3/am4eqadX/qkFszyGDzZwtbWOP1wj6vlbn/BNL4RhJeXbusLz96ajg==}
+    peerDependencies:
+      '@angular/common': 13.x - 21.x
+      '@angular/core': 13.x - 21.x
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -4049,6 +4064,8 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
+  '@webgpu/types@0.1.69': {}
+
   '@yarnpkg/lockfile@1.1.0': {}
 
   abbrev@4.0.0: {}
@@ -4750,6 +4767,12 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-angular@1.0.0(@angular/common@21.2.8(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2)):
+    dependencies:
+      '@angular/common': 21.2.8(@angular/core@21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@angular/core': 21.2.8(@angular/compiler@21.2.8)(rxjs@7.8.2)
+      tslib: 2.8.1
 
   magic-string@0.30.21:
     dependencies:

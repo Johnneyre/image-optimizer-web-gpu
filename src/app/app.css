@@ -1,0 +1,234 @@
+/* ============================================================================
+   Estilos del Componente Principal - Image Optimizer
+   ============================================================================ */
+
+:host {
+  display: block;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   Custom Range Slider
+   ============================================================================ */
+
+.slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Webkit (Chrome, Safari, Edge) */
+.slider-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 2px solid #06b6d4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.slider-thumb::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 10px rgba(6, 182, 212, 0.4);
+}
+
+.slider-thumb::-webkit-slider-thumb:active {
+  transform: scale(0.95);
+}
+
+/* Firefox */
+.slider-thumb::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: 2px solid #06b6d4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.slider-thumb::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 10px rgba(6, 182, 212, 0.4);
+}
+
+.slider-thumb::-moz-range-track {
+  background: #334155;
+  border-radius: 9999px;
+  height: 8px;
+}
+
+.slider-thumb::-moz-range-progress {
+  background: linear-gradient(to right, #06b6d4, #6366f1);
+  border-radius: 9999px;
+  height: 8px;
+}
+
+/* ============================================================================
+   Comparison Slider Styles
+   ============================================================================ */
+
+/* Smooth transitions for the comparison slider */
+[style*="clip-path"] {
+  transition: clip-path 0.05s ease-out;
+}
+
+/* Cursor styles for comparison slider dragging */
+.cursor-ew-resize {
+  cursor: ew-resize;
+}
+
+/* ============================================================================
+   Image Container Styles
+   ============================================================================ */
+
+/* Prevent image selection during drag */
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Smooth zoom transitions */
+[style*="transform"] {
+  transition: transform 0.15s ease-out;
+}
+
+/* Active dragging state - remove transitions for smooth drag */
+.dragging [style*="transform"] {
+  transition: none;
+}
+
+/* ============================================================================
+   Scrollbar Styles
+   ============================================================================ */
+
+/* Custom scrollbar for sidebar */
+aside::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+aside::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+aside::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ============================================================================
+   Animations
+   ============================================================================ */
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* Fade in animation for processed image */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* ============================================================================
+   Focus States (Accessibility)
+   ============================================================================ */
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #06b6d4;
+  outline-offset: 2px;
+}
+
+/* Remove default focus ring */
+button:focus,
+input:focus {
+  outline: none;
+}
+
+/* ============================================================================
+   Drop Zone Animation
+   ============================================================================ */
+
+@keyframes border-dance {
+  0% {
+    background-position: 0 0, 100% 100%, 0 100%, 100% 0;
+  }
+  100% {
+    background-position: 100% 0, 0 100%, 0 0, 100% 100%;
+  }
+}
+
+/* ============================================================================
+   Loading States
+   ============================================================================ */
+
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    #1e293b 0%,
+    #334155 50%,
+    #1e293b 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ============================================================================
+   Responsive Adjustments
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  /* Stack layout on smaller screens */
+  aside {
+    max-height: 50vh;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Simplify controls on mobile */
+  .slider-thumb::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .slider-thumb::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+}
