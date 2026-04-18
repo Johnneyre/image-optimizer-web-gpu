@@ -6,7 +6,7 @@
     "enabled": true
   },
   "assets": {
-    "directory": "dist/"
+    "directory": "dist/image-optimize-webgpu/browser"
   },
   "compatibility_flags": [
     "nodejs_compat"
