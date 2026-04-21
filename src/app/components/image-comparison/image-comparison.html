@@ -1,0 +1,130 @@
+<div
+  class="relative w-full h-full overflow-hidden flex items-center justify-center"
+  [class]="theme() === 'dark' ? 'bg-slate-900' : 'bg-slate-100'"
+>
+  <!-- Comparison Container -->
+  <div
+    #comparisonContainer
+    class="relative w-full h-full overflow-hidden select-none"
+    [style.cursor]="isSliderDragging() ? 'ew-resize' : zoomLevel() > 1 ? 'grab' : 'default'"
+    (mousedown)="onImageMouseDown($event)"
+    (wheel)="onWheel($event)"
+  >
+    <!-- Background: Processed Image -->
+    @if (processedImageUrl()) {
+      <div
+        class="absolute inset-0 flex items-center justify-center"
+        [style.transform]="transformStyle()"
+      >
+        <img
+          [src]="processedImageUrl()"
+          alt="Procesada"
+          class="max-w-full max-h-full object-contain"
+          draggable="false"
+        />
+      </div>
+    }
+
+    <!-- Foreground: Original Image with clip -->
+    @if (originalImageUrl()) {
+      <div
+        class="absolute inset-0 flex items-center justify-center"
+        [style.clip-path]="'inset(0 ' + (100 - sliderPosition()) + '% 0 0)'"
+        [style.transform]="transformStyle()"
+      >
+        <img
+          [src]="originalImageUrl()"
+          alt="Original"
+          class="max-w-full max-h-full object-contain"
+          draggable="false"
+        />
+      </div>
+    }
+
+    <!-- Slider Handle -->
+    <div
+      class="absolute top-0 bottom-0 w-0.5 z-20 shadow-lg slider-handle"
+      [class]="theme() === 'dark' ? 'bg-white/90' : 'bg-slate-800/90'"
+      [style.left.%]="sliderPosition()"
+      (mousedown)="onSliderMouseDown($event)"
+      (touchstart)="onSliderTouchStart($event)"
+    >
+      <!-- Knob -->
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full shadow-xl flex items-center justify-center"
+        [class]="theme() === 'dark' ? 'bg-white text-slate-800' : 'bg-slate-800 text-white'"
+      >
+        <div class="flex items-center gap-0.5">
+          <lucide-icon [img]="icons.ChevronLeft" class="w-4 h-4" />
+          <lucide-icon [img]="icons.ChevronRight" class="w-4 h-4" />
+        </div>
+      </div>
+
+      <!-- Labels -->
+      <div
+        class="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium px-2 py-1 rounded backdrop-blur-sm"
+        [class]="theme() === 'dark' ? 'bg-slate-900/80' : 'bg-white/80'"
+      >
+        <span [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'">Original</span>
+        <span class="mx-1" [class]="theme() === 'dark' ? 'text-slate-600' : 'text-slate-300'"
+          >|</span
+        >
+        <span class="text-cyan-500">Procesada</span>
+      </div>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div
+      class="absolute bottom-4 left-4 flex items-center gap-2 backdrop-blur-sm rounded-lg p-1 z-30"
+      [class]="theme() === 'dark' ? 'bg-slate-900/80' : 'bg-white/80 shadow-lg'"
+    >
+      <button
+        class="p-2 rounded-md transition-colors"
+        [class]="theme() === 'dark' ? 'hover:bg-slate-700' : 'hover:bg-slate-100'"
+        (click)="zoomOut()"
+      >
+        <lucide-icon [img]="icons.ZoomOut" class="w-4 h-4" />
+      </button>
+      <span class="text-xs font-mono w-12 text-center">{{ (zoomLevel() * 100).toFixed(0) }}%</span>
+      <button
+        class="p-2 rounded-md transition-colors"
+        [class]="theme() === 'dark' ? 'hover:bg-slate-700' : 'hover:bg-slate-100'"
+        (click)="zoomIn()"
+      >
+        <lucide-icon [img]="icons.ZoomIn" class="w-4 h-4" />
+      </button>
+      <div class="w-px h-4" [class]="theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200'"></div>
+      <button
+        class="p-2 rounded-md transition-colors"
+        [class]="theme() === 'dark' ? 'hover:bg-slate-700' : 'hover:bg-slate-100'"
+        (click)="resetView()"
+      >
+        <lucide-icon [img]="icons.RotateCcw" class="w-4 h-4" />
+      </button>
+    </div>
+
+    <!-- Processing Indicator -->
+    @if (isProcessing()) {
+      <div
+        class="absolute top-4 right-4 flex items-center gap-2 backdrop-blur-sm rounded-lg px-3 py-2 z-30"
+        [class]="theme() === 'dark' ? 'bg-slate-900/80' : 'bg-white/80 shadow-lg'"
+      >
+        <lucide-icon [img]="icons.Loader2" class="w-4 h-4 animate-spin text-cyan-500" />
+        <span class="text-sm">Procesando...</span>
+      </div>
+    }
+  </div>
+
+  <!-- Close Button -->
+  <button
+    class="absolute top-4 left-4 p-2 backdrop-blur-sm rounded-lg transition-colors z-30"
+    [class]="
+      theme() === 'dark'
+        ? 'bg-slate-900/80 hover:bg-slate-800'
+        : 'bg-white/80 hover:bg-white shadow-lg'
+    "
+    (click)="onClearImage()"
+  >
+    <lucide-icon [img]="icons.X" class="w-5 h-5" />
+  </button>
+</div>

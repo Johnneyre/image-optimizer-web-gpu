@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  height: calc(100dvh - 57px);
+  overflow: hidden;
+}
+
+.workspace-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Smooth theme transitions synchronized with app shell */
+.workspace-shell,
+.workspace-shell * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}

@@ -1,0 +1,99 @@
+:host {
+  display: contents;
+}
+
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  animation: overlay-fade-in 0.3s ease-out;
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ============================================================================
+   Animated Loader Rings
+   ============================================================================ */
+
+.loader-rings {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.ring-outer {
+  inset: 0;
+  border-top-color: #06b6d4;
+  border-right-color: #06b6d4;
+  animation: spin 1.5s linear infinite;
+}
+
+.ring-middle {
+  inset: 12px;
+  border-bottom-color: #818cf8;
+  border-left-color: #818cf8;
+  animation: spin 1.2s linear infinite reverse;
+}
+
+.ring-inner {
+  inset: 24px;
+  border-top-color: #06b6d4;
+  border-left-color: #818cf8;
+  animation: spin 0.9s linear infinite;
+}
+
+.ring-center {
+  position: absolute;
+  inset: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================================
+   Keyframes
+   ============================================================================ */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,237 @@
+<aside
+  class="w-full lg:w-80 xl:w-96 flex flex-col border-t lg:border-t-0 lg:border-l transition-colors"
+  [class]="theme() === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'"
+>
+  <!-- File Info -->
+  <div class="p-4 border-b" [class]="theme() === 'dark' ? 'border-slate-800' : 'border-slate-200'">
+    <div class="flex items-start gap-3">
+      <div
+        class="p-2 rounded-lg shrink-0"
+        [class]="theme() === 'dark' ? 'bg-slate-800' : 'bg-slate-100'"
+      >
+        <lucide-icon
+          [img]="icons.Image"
+          class="w-5 h-5"
+          [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'"
+        />
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium truncate" [title]="fileName()">{{ fileName() }}</p>
+        <p class="text-xs" [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'">
+          {{ originalSize() }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Badge -->
+  @if (hasStats()) {
+    <div
+      class="p-4 border-b"
+      [class]="theme() === 'dark' ? 'border-slate-800' : 'border-slate-200'"
+    >
+      <div
+        class="flex items-center justify-between p-3 rounded-lg border"
+        [class]="
+          sizeDifference()?.isReduction
+            ? 'bg-emerald-500/10 border-emerald-500/20'
+            : 'bg-amber-500/10 border-amber-500/20'
+        "
+      >
+        <div class="flex items-center gap-2">
+          <lucide-icon
+            [img]="icons.FileDown"
+            class="w-4 h-4"
+            [class]="sizeDifference()?.isReduction ? 'text-emerald-500' : 'text-amber-500'"
+          />
+          <span class="text-sm">{{ originalSize() }} → {{ processedSize() }}</span>
+        </div>
+        <span
+          class="text-sm font-semibold"
+          [class]="sizeDifference()?.isReduction ? 'text-emerald-500' : 'text-amber-500'"
+        >
+          {{ sizeDifference()?.percent }}
+        </span>
+      </div>
+
+      @if (processingTime()) {
+        <div
+          class="flex items-center gap-2 mt-2 text-xs"
+          [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'"
+        >
+          <lucide-icon [img]="icons.Clock" class="w-3.5 h-3.5" />
+          <span>Procesado en {{ processingTime() }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Controls -->
+  <div class="flex-1 overflow-y-auto">
+    <div class="p-4 space-y-6">
+      <!-- Quality Presets -->
+      <div>
+        <label class="block text-sm font-medium mb-3">Presets de Calidad</label>
+        <div class="grid grid-cols-4 gap-2">
+          @for (preset of qualityPresets; track preset.value) {
+            <button
+              class="p-2 rounded-lg border text-center transition-all"
+              [class]="
+                selectedPreset() === preset.value
+                  ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500'
+                  : theme() === 'dark'
+                    ? 'bg-slate-800 border-slate-700 hover:border-slate-600'
+                    : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+              "
+              (click)="onSelectPreset(preset.value)"
+            >
+              <span class="text-sm font-medium">{{ preset.label }}</span>
+              <span
+                class="block text-xs mt-0.5"
+                [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'"
+              >
+                {{ preset.description }}
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Quality Slider -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-sm font-medium">Calidad Manual</label>
+          <span class="text-sm font-mono text-cyan-500">{{ quality() }}%</span>
+        </div>
+        <input
+          type="range"
+          min="1"
+          max="100"
+          [value]="quality()"
+          (input)="onQualityChange($event)"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb"
+          [class]="theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200'"
+        />
+        <div
+          class="flex justify-between text-xs mt-1"
+          [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'"
+        >
+          <span>Menor</span>
+          <span>Mayor</span>
+        </div>
+      </div>
+
+      <!-- Brightness -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label class="flex items-center gap-2 text-sm font-medium">
+            <lucide-icon [img]="icons.Sun" class="w-4 h-4 text-amber-500" />
+            Brillo
+          </label>
+          <span
+            class="text-sm font-mono"
+            [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'"
+          >
+            {{ brightness() > 0 ? '+' : '' }}{{ (brightness() * 100).toFixed(0) }}%
+          </span>
+        </div>
+        <input
+          type="range"
+          min="-1"
+          max="1"
+          step="0.01"
+          [value]="brightness()"
+          (input)="onBrightnessChange($event)"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb"
+          [class]="theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200'"
+        />
+      </div>
+
+      <!-- Contrast -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label class="flex items-center gap-2 text-sm font-medium">
+            <lucide-icon [img]="icons.Contrast" class="w-4 h-4 text-violet-500" />
+            Contraste
+          </label>
+          <span
+            class="text-sm font-mono"
+            [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'"
+          >
+            {{ (contrast() * 100).toFixed(0) }}%
+          </span>
+        </div>
+        <input
+          type="range"
+          min="0"
+          max="2"
+          step="0.01"
+          [value]="contrast()"
+          (input)="onContrastChange($event)"
+          class="w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb"
+          [class]="theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200'"
+        />
+      </div>
+
+      <!-- Reset -->
+      <button
+        class="w-full py-2 px-4 flex items-center justify-center gap-2 rounded-lg border transition-colors"
+        [class]="
+          theme() === 'dark'
+            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700'
+            : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+        "
+        (click)="onResetAdjustments()"
+      >
+        <lucide-icon [img]="icons.RotateCcw" class="w-4 h-4" />
+        <span class="text-sm">Restablecer Ajustes</span>
+      </button>
+
+      <!-- Download Format -->
+      <div>
+        <label class="block text-sm font-medium mb-2">Formato de Descarga</label>
+        <div class="grid grid-cols-3 gap-2">
+          @for (fmt of formatOptions; track fmt.value) {
+            <button
+              class="p-2 rounded-lg border text-center transition-all text-sm font-medium"
+              [class]="
+                selectedFormat() === fmt.value
+                  ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500'
+                  : theme() === 'dark'
+                    ? 'bg-slate-800 border-slate-700 hover:border-slate-600'
+                    : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+              "
+              (click)="selectedFormat.set(fmt.value)"
+            >
+              {{ fmt.label }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Button -->
+  <div class="p-4 border-t" [class]="theme() === 'dark' ? 'border-slate-800' : 'border-slate-200'">
+    <button
+      class="w-full py-3 px-4 flex items-center justify-center gap-2 rounded-lg font-medium transition-all"
+      [class]="
+        canDownload()
+          ? 'bg-linear-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white shadow-lg shadow-cyan-500/25'
+          : theme() === 'dark'
+            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+      "
+      [disabled]="!canDownload()"
+      (click)="onDownload()"
+    >
+      @if (isProcessing()) {
+        <lucide-icon [img]="icons.Loader2" class="w-5 h-5 animate-spin" />
+        <span>Procesando...</span>
+      } @else {
+        <lucide-icon [img]="icons.Download" class="w-5 h-5" />
+        <span>Descargar {{ formatExtension() | uppercase }}</span>
+      }
+    </button>
+  </div>
+</aside>

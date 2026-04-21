@@ -1,0 +1,64 @@
+<div
+  class="flex-1 flex items-center justify-center p-8 h-full"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <div
+    class="w-full max-w-2xl aspect-video border-2 border-dashed rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-6 cursor-pointer group"
+    [class]="isDragging
+      ? 'border-cyan-500 bg-cyan-500/10 scale-[1.02]'
+      : theme() === 'dark'
+        ? 'border-slate-700 hover:border-slate-600 bg-slate-900/50 hover:bg-slate-900'
+        : 'border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50'"
+    (click)="triggerFileInput()"
+  >
+    <div
+      class="p-6 rounded-full transition-colors"
+      [class]="isDragging
+        ? 'bg-cyan-500/20'
+        : theme() === 'dark'
+          ? 'bg-slate-800 group-hover:bg-slate-700'
+          : 'bg-slate-100 group-hover:bg-slate-200'"
+    >
+      <lucide-icon
+        [img]="icons.Upload"
+        class="w-12 h-12 transition-colors"
+        [class]="isDragging
+          ? 'text-cyan-400'
+          : theme() === 'dark'
+            ? 'text-slate-400 group-hover:text-slate-300'
+            : 'text-slate-400 group-hover:text-slate-500'"
+      />
+    </div>
+
+    <div class="text-center">
+      <p class="text-lg font-medium">
+        @if (isDragging) {
+          Suelta la imagen aqui
+        } @else {
+          Arrastra una imagen o haz clic para seleccionar
+        }
+      </p>
+      <p class="text-sm mt-2" [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'">
+        Soporta PNG, JPG, WebP y mas
+      </p>
+    </div>
+
+    @if (isSupported() === false) {
+      <div class="px-4 py-2 bg-red-500/10 border border-red-500/30 rounded-lg">
+        <p class="text-sm text-red-500">
+          Tu navegador no soporta WebGPU. Intenta con Chrome 113+ o Edge 113+
+        </p>
+      </div>
+    }
+  </div>
+
+  <input
+    #fileInput
+    type="file"
+    accept="image/*"
+    class="hidden"
+    (change)="onFileSelect($event)"
+  />
+</div>

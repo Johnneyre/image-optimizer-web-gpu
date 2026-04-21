@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Smooth theme transitions synchronized with app shell */
+:host {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Slider handle - wide hit area for easier grabbing */
+.slider-handle {
+  cursor: ew-resize;
+  /* Extend the clickable area beyond the thin visual line */
+  padding: 0 12px;
+  margin: 0 -12px;
+}
+
+/* Smooth transitions for the comparison slider */
+[style*='clip-path'] {
+  transition: clip-path 0.05s ease-out;
+}
+
+/* Prevent image selection during drag */
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Smooth zoom transitions */
+[style*='transform'] {
+  transition: transform 0.15s ease-out;
+}

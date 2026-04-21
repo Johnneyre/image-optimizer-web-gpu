@@ -1,0 +1,62 @@
+<div class="landing-page" [class]="theme() === 'dark' ? 'theme-dark' : 'theme-light'">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <h1 class="hero-title">Optimize Images at the Speed of Light</h1>
+      <p class="hero-subtitle">
+        Experience blazing-fast image compression directly in your browser, powered by
+        next-generation WebGPU technology. No servers, maximum privacy.
+      </p>
+    </div>
+  </section>
+
+  <!-- Drop Zone Section -->
+  <section id="drop-zone-section" class="dropzone-section">
+    <div
+      class="dropzone-wrapper"
+      [class.dropzone-dragging]="isDragging()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="triggerFileInput()"
+    >
+      <!-- Corner decorations -->
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <!-- Glow effect -->
+      <div class="dropzone-glow"></div>
+
+      <!-- Main content -->
+      <div class="dropzone-inner">
+        <div class="dropzone-content">
+          <div class="dropzone-icon-wrapper">
+            <lucide-icon [img]="icons.Upload" class="dropzone-icon" />
+          </div>
+          <p class="dropzone-text">
+            @if (isDragging()) {
+              Drop your image here
+            } @else {
+              Drag and drop an image or click to select.
+            }
+          </p>
+          <p class="dropzone-hint">Supports PNG, JPG, WebP and more.</p>
+        </div>
+
+        @if (isSupported() === false) {
+          <div class="dropzone-warning">
+            <lucide-icon [img]="icons.AlertCircle" class="warning-icon" />
+            <p>Your browser does not support WebGPU. Try Chrome 113+ or Edge 113+.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileSelect($event)" />
+  </section>
+
+  <!-- Features Section -->
+  <app-features-section />
+</div>

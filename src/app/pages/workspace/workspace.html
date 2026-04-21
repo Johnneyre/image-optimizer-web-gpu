@@ -1,0 +1,46 @@
+<div
+  class="workspace-shell"
+  [class]="theme() === 'dark'
+    ? 'bg-slate-950 text-slate-100'
+    : 'bg-slate-50 text-slate-900'"
+>
+  <!-- Editor Layout -->
+  <div class="flex-1 flex flex-col lg:flex-row">
+    <!-- Image Comparison Area -->
+    <app-image-comparison
+      [theme]="theme()"
+      [originalImageUrl]="originalImageUrl()"
+      [processedImageUrl]="processedImageUrl()"
+      [isProcessing]="isProcessing()"
+      (clearImage)="clearImage()"
+    />
+
+    <!-- Sidebar Controls -->
+    <app-sidebar-controls
+      [theme]="theme()"
+      [fileName]="fileName()"
+      [originalSize]="originalSize()"
+      [processedSize]="processedSize()"
+      [sizeDifference]="sizeDifference()"
+      [processingTime]="processingTime()"
+      [quality]="quality()"
+      [brightness]="brightness()"
+      [contrast]="contrast()"
+      [isProcessing]="isProcessing()"
+      [canDownload]="canDownload()"
+      [hasStats]="hasStats()"
+      (qualityChange)="onQualityChange($event)"
+      (brightnessChange)="onBrightnessChange($event)"
+      (contrastChange)="onContrastChange($event)"
+      (presetSelect)="onPresetSelect($event)"
+      (resetAdjustments)="resetAdjustments()"
+      (downloadRequested)="onDownloadRequested($event)"
+    />
+  </div>
+</div>
+
+<!-- Download Overlay (Fullscreen loader) -->
+<app-download-overlay
+  [theme]="theme()"
+  [isVisible]="isDownloading()"
+/>

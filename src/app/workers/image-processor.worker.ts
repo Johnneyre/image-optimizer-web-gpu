@@ -115,15 +115,10 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     contrastCurve(color.b, params.contrast)
   );
 
-  // Simulación de compresión de calidad
+  // Simulación de compresión de calidad (posterización)
   let qualityFactor = params.quality / 100.0;
-  let levels = mix(4.0, 256.0, qualityFactor);
+  let levels = mix(8.0, 256.0, qualityFactor);
   color = floor(color * levels + 0.5) / levels;
-
-  // Mezcla con escala de grises para calidades bajas
-  let luminance = dot(color, vec3<f32>(0.2126, 0.7152, 0.0722));
-  let chromaRetention = smoothstep(0.0, 0.3, qualityFactor);
-  color = mix(vec3<f32>(luminance), color, chromaRetention);
 
   let result = vec4<f32>(clamp(color, vec3<f32>(0.0), vec3<f32>(1.0)), pixel.a);
   outputPixels[index] = packRGBA(result);
@@ -208,7 +203,7 @@ function ensureBuffers(pixelCount: number) {
 
   const requiredSize = pixelCount * 4;
 
-  if (bufferCache && bufferCache.size === requiredSize) {
+  if (bufferCache?.size === requiredSize) {
     return bufferCache;
   }
 
@@ -356,7 +351,7 @@ function cleanup(): void {
 // Message Handler
 // ============================================================================
 
-self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
+globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
   const message = event.data;
 
   try {

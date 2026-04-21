@@ -35,12 +35,15 @@ export interface ProcessingStats {
 export class ImageProcessingService implements OnDestroy {
   private worker: Worker | null = null;
   private requestIdCounter = 0;
-  private pendingRequests = new Map<number, {
-    resolve: (value: ProcessingResult) => void;
-    reject: (reason: Error) => void;
-  }>();
+  private pendingRequests = new Map<
+    number,
+    {
+      resolve: (value: ProcessingResult) => void;
+      reject: (reason: Error) => void;
+    }
+  >();
 
-  private processRequest$ = new Subject<{
+  private readonly processRequest$ = new Subject<{
     file: File | Blob;
     params: ProcessingParams;
   }>();
@@ -117,9 +120,9 @@ export class ImageProcessingService implements OnDestroy {
                 this.lastError.set(error.message);
               }
               return of(null);
-            })
-          )
-        )
+            }),
+          ),
+        ),
       )
       .subscribe(async (result) => {
         if (result) {
@@ -144,7 +147,7 @@ export class ImageProcessingService implements OnDestroy {
       this.worker.onerror = this.handleWorkerError.bind(this);
 
       this.worker.postMessage({ type: 'init' });
-    } catch (error) {
+    } catch {
       this.isSupported.set(false);
       this.isInitializing.set(false);
     }
@@ -211,11 +214,15 @@ export class ImageProcessingService implements OnDestroy {
   }
 
   private async updateProcessedImage(result: ProcessingResult): Promise<void> {
-    console.log('[Service] updateProcessedImage', { width: result.width, height: result.height, dataLength: result.imageData.length });
+    console.log('[Service] updateProcessedImage', {
+      width: result.width,
+      height: result.height,
+      dataLength: result.imageData.length,
+    });
 
     // Liberar URL anterior
     const oldUrl = this.processedImageUrl();
-    if (oldUrl && oldUrl.startsWith('blob:')) {
+    if (oldUrl?.startsWith('blob:')) {
       URL.revokeObjectURL(oldUrl);
     }
 
@@ -233,7 +240,7 @@ export class ImageProcessingService implements OnDestroy {
     const imageData = new ImageData(
       new Uint8ClampedArray(result.imageData),
       result.width,
-      result.height
+      result.height,
     );
     ctx.putImageData(imageData, 0, 0);
 
@@ -291,7 +298,7 @@ export class ImageProcessingService implements OnDestroy {
     if (url) URL.revokeObjectURL(url);
 
     const processedUrl = this.processedImageUrl();
-    if (processedUrl && processedUrl.startsWith('blob:')) {
+    if (processedUrl?.startsWith('blob:')) {
       URL.revokeObjectURL(processedUrl);
     }
 
@@ -306,7 +313,7 @@ export class ImageProcessingService implements OnDestroy {
 
   async generateDownloadBlob(
     format: 'image/webp' | 'image/png' | 'image/jpeg' = 'image/webp',
-    quality: number = 0.85
+    quality: number = 0.85,
   ): Promise<Blob> {
     const url = this.processedImageUrl();
     if (!url) throw new Error('No hay imagen procesada');
@@ -334,14 +341,14 @@ export class ImageProcessingService implements OnDestroy {
       canvas.toBlob(
         (b) => (b ? resolve(b) : reject(new Error('Error generando blob'))),
         format,
-        quality
+        quality,
       );
     });
   }
 
   private async processImageInternal(
     file: File | Blob,
-    params: ProcessingParams
+    params: ProcessingParams,
   ): Promise<ProcessingResult> {
     if (!this.worker || !this.isReady()) {
       throw new Error('Servicio no inicializado');
@@ -364,7 +371,7 @@ export class ImageProcessingService implements OnDestroy {
           params,
           requestId,
         },
-        [imageBitmap]
+        [imageBitmap],
       );
     });
   }
