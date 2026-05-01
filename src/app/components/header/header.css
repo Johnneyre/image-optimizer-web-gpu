@@ -1,9 +1,169 @@
 :host {
   display: block;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
-/* Smooth theme transitions synchronized with app shell */
-:host,
-:host * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+.site-header {
+  border-bottom: 1px solid oklch(from var(--border) l c h / 0.6);
+  background: oklch(from var(--background) l c h / 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
 }
+
+.header-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (min-width: 640px) {
+  .header-container {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-container {
+    padding: 0.75rem 2rem;
+  }
+}
+
+/* Brand */
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  background: linear-gradient(to bottom right, var(--primary), oklch(from var(--primary) l c h / 0.7));
+}
+
+.header-logo lucide-icon {
+  color: white;
+}
+
+.header-name {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.header-tagline {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+/* Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* GPU Status */
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.header-status-text {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .header-status-text {
+    display: inline;
+  }
+}
+
+.header-status-error {
+  color: oklch(0.65 0.2 25);
+}
+
+.header-status-error lucide-icon {
+  color: oklch(0.65 0.2 25);
+}
+
+.header-gpu-info {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: oklch(from var(--muted) l c h / 0.4);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.header-gpu-info lucide-icon {
+  color: var(--primary);
+}
+
+@media (min-width: 768px) {
+  .header-gpu-info {
+    display: flex;
+  }
+}
+
+/* Theme Toggle */
+.header-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-theme-toggle:hover {
+  background: oklch(from var(--muted) l c h / 0.5);
+  color: var(--foreground);
+}
+
+.header-theme-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+/* Animation */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

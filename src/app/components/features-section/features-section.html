@@ -1,15 +1,36 @@
-<section class="features-section" [class]="theme() === 'dark' ? 'theme-dark' : 'theme-light'">
-  <h2 class="features-title">Features</h2>
-
-  <div class="features-grid">
-    @for (feature of features; track feature.title) {
-      <div class="feature-card">
-        <div class="feature-icon-wrapper" [class]="feature.iconClass">
-          <lucide-icon [img]="feature.icon" class="feature-icon" />
-        </div>
-        <h3 class="feature-title-card">{{ feature.title }}</h3>
-        <p class="feature-desc">{{ feature.description }}</p>
+<section class="features-section" [class.dark]="theme() === 'dark'">
+  <div class="features-container">
+    <!-- Header -->
+    <div class="features-header">
+      <div class="features-badge">
+        <span class="features-badge-dot"></span>
+        Características
       </div>
-    }
+      <h2 class="features-title">
+        Toda la potencia de la GPU, <span class="features-title-accent">sin complicaciones</span>
+      </h2>
+      <p class="features-subtitle">
+        Una herramienta pensada para desarrolladores y diseñadores que necesitan velocidad real sin sacrificar la privacidad de sus archivos.
+      </p>
+    </div>
+
+    <!-- Grid -->
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <div class="feature-card">
+          <!-- Glow effect -->
+          <div class="feature-card-glow" aria-hidden="true"></div>
+
+          <!-- Icon -->
+          <div class="feature-icon-wrapper">
+            <lucide-icon [img]="feature.icon" class="feature-icon" />
+          </div>
+
+          <!-- Content -->
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+        </div>
+      }
+    </div>
   </div>
 </section>

@@ -1,51 +1,41 @@
-<header
-  class="border-b backdrop-blur-sm sticky top-0 z-50 transition-colors"
-  [class]="theme() === 'dark'
-    ? 'border-slate-800 bg-slate-900/80'
-    : 'border-slate-200 bg-white/80'"
->
-  <div class="max-w-[1920px] mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="p-2 bg-linear-to-br from-indigo-500 to-cyan-500 rounded-lg">
-        <lucide-icon [img]="icons.Zap" class="w-5 h-5 text-white" />
+<header class="site-header">
+  <div class="header-container">
+    <div class="header-brand">
+      <div class="header-logo">
+        <lucide-icon [img]="icons.Zap" [size]="18" [strokeWidth]="2" />
       </div>
       <div>
-        <h1 class="text-lg font-semibold">ImageOptimize</h1>
-        <p class="text-xs" [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'">
-          WebGPU-Powered
-        </p>
+        <h1 class="header-name">ImageOptimize</h1>
+        <p class="header-tagline">WebGPU-Powered</p>
       </div>
     </div>
 
-    <div class="flex items-center gap-4">
+    <div class="header-actions">
       <!-- GPU Status -->
       @if (isInitializing()) {
-        <div class="flex items-center gap-2 text-sm" [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'">
-          <lucide-icon [img]="icons.Loader2" class="w-4 h-4 animate-spin" />
-          <span class="hidden sm:inline">Inicializando WebGPU...</span>
+        <div class="header-status">
+          <lucide-icon [img]="icons.Loader2" [size]="16" [strokeWidth]="2" class="animate-spin" />
+          <span class="header-status-text">Inicializando WebGPU...</span>
         </div>
       } @else if (isSupported() === false) {
-        <div class="flex items-center gap-2 text-sm text-red-500">
-          <lucide-icon [img]="icons.AlertCircle" class="w-4 h-4" />
-          <span class="hidden sm:inline">WebGPU no soportado</span>
+        <div class="header-status header-status-error">
+          <lucide-icon [img]="icons.AlertCircle" [size]="16" [strokeWidth]="2" />
+          <span class="header-status-text">WebGPU no soportado</span>
         </div>
       } @else if (adapterInfo()) {
-        <div class="hidden md:flex items-center gap-2 text-xs" [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'">
-          <lucide-icon [img]="icons.Gpu" class="w-3.5 h-3.5" />
+        <div class="header-gpu-info">
+          <lucide-icon [img]="icons.Gpu" [size]="14" [strokeWidth]="2" />
           <span>{{ adapterInfo() }}</span>
         </div>
       }
 
       <!-- Theme Toggle -->
       <button
-        class="p-2 rounded-lg transition-colors"
-        [class]="theme() === 'dark'
-          ? 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'
-          : 'hover:bg-slate-100 text-slate-500 hover:text-slate-700'"
+        class="header-theme-toggle"
         (click)="onToggleTheme()"
         [title]="theme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
       >
-        <lucide-icon [img]="theme() === 'dark' ? icons.Sun : icons.Moon" class="w-5 h-5" />
+        <lucide-icon [img]="theme() === 'dark' ? icons.Sun : icons.Moon" [size]="20" [strokeWidth]="2" />
       </button>
     </div>
   </div>

@@ -1,0 +1,66 @@
+:host {
+  display: block;
+}
+
+.stats-section {
+  max-width: 48rem;
+  margin: 3.5rem auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .stats-section {
+    gap: 1.5rem;
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-section {
+    padding: 0 2rem;
+  }
+}
+
+.stat-card {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid oklch(from var(--border) l c h / 0.4);
+  background: oklch(from var(--card) l c h / 0.5);
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.stat-card:hover {
+  border-color: oklch(from var(--primary) l c h / 0.25);
+  background: oklch(from var(--card) l c h / 0.7);
+}
+
+.stat-value {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+}
+
+@media (min-width: 640px) {
+  .stat-value {
+    font-size: 1.875rem;
+  }
+}
+
+.stat-label {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+@media (min-width: 640px) {
+  .stat-label {
+    font-size: 0.875rem;
+  }
+}

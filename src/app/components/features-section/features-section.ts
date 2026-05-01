@@ -1,10 +1,18 @@
 import { Component, inject } from '@angular/core';
-import { LucideAngularModule, Zap, Shield, Sparkles, LucideIconData } from 'lucide-angular';
+import {
+  LucideAngularModule,
+  Cpu,
+  ShieldCheck,
+  Gauge,
+  SlidersHorizontal,
+  FileImage,
+  Wand2,
+  LucideIconData,
+} from 'lucide-angular';
 import { ThemeService } from '../../services/theme.service';
 
 interface Feature {
   icon: LucideIconData;
-  iconClass: string;
   title: string;
   description: string;
 }
@@ -21,26 +29,40 @@ export class FeaturesSectionComponent {
 
   readonly theme = this.themeService.theme;
 
-  readonly icons = { Zap, Shield, Sparkles };
-
   readonly features: Feature[] = [
     {
-      icon: Zap,
-      iconClass: 'feature-icon-cyan',
-      title: 'Lightning Fast Processing',
-      description: 'Experience 10x faster optimization without compromising quality.',
+      icon: Cpu,
+      title: 'Aceleración WebGPU',
+      description:
+        'Usa shaders nativos que corren directo en tu GPU. Procesa imágenes de varios MB en milisegundos, no segundos.',
     },
     {
-      icon: Sparkles,
-      iconClass: 'feature-icon-violet',
-      title: 'Lossless Quality',
-      description: 'Maintain the highest quality with advanced WebGPU compression.',
+      icon: ShieldCheck,
+      title: '100% privado y local',
+      description:
+        'Tus imágenes nunca salen de tu navegador. Sin uploads, sin tracking, sin servidores intermediarios.',
     },
     {
-      icon: Shield,
-      iconClass: 'feature-icon-emerald',
-      title: 'Secure & Private',
-      description: 'All processing happens locally. Your images never leave your device.',
+      icon: Gauge,
+      title: 'Compresión inteligente',
+      description:
+        'Algoritmos optimizados que reducen hasta un 80% el tamaño manteniendo la calidad visual de la imagen.',
+    },
+    {
+      icon: SlidersHorizontal,
+      title: 'Controles en tiempo real',
+      description:
+        'Ajusta brillo, contraste y calidad con previsualización instantánea mediante un slider de antes/después.',
+    },
+    {
+      icon: FileImage,
+      title: 'Múltiples formatos',
+      description: 'Exporta a WebP, JPEG o PNG. Convierte entre formatos modernos sin herramientas externas.',
+    },
+    {
+      icon: Wand2,
+      title: 'Presets inteligentes',
+      description: 'Calidad Original, Alta, Media o Baja en un clic. O ajusta manualmente con control milimétrico.',
     },
   ];
 }

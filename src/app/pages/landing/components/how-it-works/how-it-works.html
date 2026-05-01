@@ -1,0 +1,37 @@
+<section class="how-it-works-section">
+  <!-- Section header -->
+  <div class="section-header">
+    <div class="section-badge">
+      <span class="section-badge-dot"></span>
+      <span>Cómo funciona</span>
+    </div>
+    <h2 class="section-title">Optimización en tres simples pasos</h2>
+  </div>
+
+  <!-- Steps grid -->
+  <div class="steps-grid">
+    <!-- Connector line -->
+    <div class="steps-connector" aria-hidden="true"></div>
+
+    @for (step of steps; track step.n) {
+      <div class="step-card">
+        <!-- Icon -->
+        <div class="step-icon-wrapper">
+          <div class="step-icon-outer">
+            <div class="step-icon-inner"></div>
+            <lucide-icon [img]="step.icon" [size]="24" [strokeWidth]="2" />
+          </div>
+        </div>
+
+        <!-- Number -->
+        <p class="step-number">PASO {{ step.n }}</p>
+
+        <!-- Title -->
+        <h3 class="step-title">{{ step.title }}</h3>
+
+        <!-- Description -->
+        <p class="step-description">{{ step.description }}</p>
+      </div>
+    }
+  </div>
+</section>

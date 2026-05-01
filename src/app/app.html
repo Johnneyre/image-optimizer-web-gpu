@@ -1,9 +1,7 @@
 <!-- Layout Principal con Tema Dinámico -->
 <div
   class="app-shell"
-  [class]="theme() === 'dark'
-    ? 'bg-slate-950 text-slate-100'
-    : 'bg-slate-50 text-slate-900'"
+  [class.dark]="theme() === 'dark'"
 >
   <!-- Header -->
   <app-header

@@ -1,15 +1,60 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================================
+   Global Styles - ImageOptimize Landing
+   ============================================================================ */
 
 @import 'tailwindcss';
 
 /* ============================================================================
-   Global Styles
+   CSS Variables - Theme System (OKLCh)
    ============================================================================ */
 
 :root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+  /* Light mode */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.72 0.15 220);
+  --primary-foreground: oklch(0.145 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+  --ring: oklch(0.72 0.15 220);
+  --radius: 0.75rem;
+
+  /* Font families */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 }
+
+.dark {
+  /* Deep navy background */
+  --background: oklch(0.17 0.025 255);
+  --foreground: oklch(0.985 0 0);
+
+  /* Elevated navy for cards */
+  --card: oklch(0.21 0.03 255);
+  --card-foreground: oklch(0.985 0 0);
+
+  /* Cyan brand */
+  --primary: oklch(0.78 0.14 215);
+  --primary-foreground: oklch(0.17 0.025 255);
+
+  --secondary: oklch(0.26 0.03 255);
+  --secondary-foreground: oklch(0.985 0 0);
+
+  --muted: oklch(0.26 0.03 255);
+  --muted-foreground: oklch(0.68 0.02 255);
+
+  --border: oklch(0.3 0.03 255 / 0.6);
+  --ring: oklch(0.78 0.14 215);
+}
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
 
 html {
   font-family: var(--font-sans);
@@ -20,6 +65,8 @@ html {
 body {
   margin: 0;
   padding: 0;
+  background-color: var(--background);
+  color: var(--foreground);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -33,11 +80,83 @@ label,
 /* Smooth scrolling */
 * {
   scroll-behavior: smooth;
+  box-sizing: border-box;
 }
 
-/* Box sizing reset */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* ============================================================================
+   Utility Classes
+   ============================================================================ */
+
+/* Animated grid background */
+.bg-grid-landing {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--foreground) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 5%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Radial fade mask */
+.mask-radial-fade {
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+}
+
+/* Float animation */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow {
+    animation: none;
+  }
+}
+
+/* Text balance utility */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Backdrop blur utilities */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.backdrop-blur-3xl {
+  backdrop-filter: blur(64px);
+  -webkit-backdrop-filter: blur(64px);
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible ring */
+.focus-visible-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring), 0 0 0 4px oklch(from var(--ring) l c h / 0.2);
 }
