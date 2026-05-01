@@ -1,0 +1,126 @@
+:host {
+  display: block;
+}
+
+.hero-section {
+  position: relative;
+  padding: 3rem 1rem 0;
+}
+
+@media (min-width: 640px) {
+  .hero-section {
+    padding: 4rem 1.5rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-section {
+    padding: 6rem 2rem 0;
+  }
+}
+
+/* Hero content */
+.hero-content {
+  max-width: 48rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Feature badge */
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid oklch(from var(--primary) l c h / 0.25);
+  background: oklch(from var(--primary) l c h / 0.08);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+/* Hero title */
+.hero-title {
+  margin-top: 1.5rem;
+  font-size: 2.25rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  color: var(--foreground);
+  text-wrap: balance;
+}
+
+@media (min-width: 640px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: 3.75rem;
+  }
+}
+
+.hero-title-gradient {
+  display: block;
+  color: var(--primary);
+}
+
+/* Hero subtitle */
+.hero-subtitle {
+  max-width: 42rem;
+  margin: 1.25rem auto 0;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+@media (min-width: 640px) {
+  .hero-subtitle {
+    font-size: 1.125rem;
+  }
+}
+
+.hero-subtitle-highlight {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Hero features list */
+.hero-features {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.75rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.hero-feature-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-feature-item lucide-icon {
+  color: var(--primary);
+}
+
+.hero-feature-dot {
+  display: none;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--border);
+}
+
+@media (min-width: 640px) {
+  .hero-feature-dot {
+    display: inline-block;
+  }
+}

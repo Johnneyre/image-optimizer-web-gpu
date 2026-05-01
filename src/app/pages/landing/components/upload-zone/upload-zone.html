@@ -1,0 +1,78 @@
+<div class="upload-wrapper">
+  <!-- Glow effect -->
+  <div class="upload-glow" aria-hidden="true"></div>
+
+  <!-- Upload zone button -->
+  <button
+    type="button"
+    class="upload-zone group"
+    [class.dragging]="isDragging()"
+    (click)="triggerFileInput()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    aria-label="Subir imagen"
+  >
+    <!-- Corner accents -->
+    <span class="upload-corner upload-corner-tl"></span>
+    <span class="upload-corner upload-corner-tr"></span>
+    <span class="upload-corner upload-corner-bl"></span>
+    <span class="upload-corner upload-corner-br"></span>
+
+    <div class="upload-content">
+      <!-- Icon -->
+      <div class="upload-icon-wrapper">
+        <div class="upload-icon-bg">
+          <lucide-icon [img]="icons.Upload" [size]="32" [strokeWidth]="2" />
+        </div>
+        <span class="upload-icon-badge">
+          <lucide-icon [img]="icons.ImageIcon" [size]="14" />
+        </span>
+      </div>
+
+      <!-- Text -->
+      <div class="upload-text-container">
+        <h3 class="upload-title">
+          @if (isDragging()) {
+            Suelta tu imagen aquí
+          } @else {
+            Arrastra una imagen o haz clic para seleccionar
+          }
+        </h3>
+        <p class="upload-subtitle">
+          La imagen se procesa <span class="upload-subtitle-highlight">100% local</span> en tu GPU. Nada se sube a ningún servidor.
+        </p>
+      </div>
+
+      <!-- Format tags -->
+      <div class="upload-formats">
+        @for (format of formats; track format) {
+          <span class="upload-format-tag">
+            <lucide-icon [img]="icons.FileImage" [size]="12" />
+            {{ format }}
+          </span>
+        }
+      </div>
+    </div>
+  </button>
+
+  <!-- Hint -->
+  <p class="upload-hint">Tamaño máximo recomendado: 50 MB · Resolución ilimitada</p>
+
+  <!-- Warning -->
+  @if (isSupported() === false) {
+    <div class="upload-warning">
+      <lucide-icon [img]="icons.AlertCircle" [size]="16" />
+      <p>Tu navegador no soporta WebGPU. Prueba con Chrome 113+ o Edge 113+.</p>
+    </div>
+  }
+
+  <!-- Hidden file input -->
+  <input
+    #fileInput
+    type="file"
+    accept="image/*"
+    class="sr-only"
+    (change)="onFileSelect($event)"
+  />
+</div>
