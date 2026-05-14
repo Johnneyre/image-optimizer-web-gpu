@@ -67,3 +67,7 @@
   background: oklch(from var(--primary) l c h / 0.07);
 }
 
+.how-it-works-placeholder {
+  min-height: 500px;
+}
+

@@ -20,7 +20,11 @@
   </div>
 
   <!-- How It Works Section -->
-  <app-how-it-works />
+  @defer (on viewport) {
+    <app-how-it-works />
+  } @placeholder {
+    <div class="how-it-works-placeholder"></div>
+  }
 
   <!-- Footer -->
   <app-site-footer />
