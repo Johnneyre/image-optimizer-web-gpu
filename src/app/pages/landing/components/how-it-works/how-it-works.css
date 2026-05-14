@@ -21,13 +21,11 @@
   }
 }
 
-/* Section header */
-.section-header {
-  max-width: 32rem;
-  margin: 0 auto;
-  text-align: center;
-}
+/* ==============================
+   SHARED ELEMENTS
+   ============================== */
 
+/* Section badge */
 .section-badge {
   display: inline-flex;
   align-items: center;
@@ -61,6 +59,227 @@
   .section-title {
     font-size: 2.25rem;
   }
+}
+
+/* ==============================
+   DEMO MODE — Split Layout
+   ============================== */
+
+.demo-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  animation: demoFadeIn 0.6s ease-out both;
+}
+
+@media (min-width: 1024px) {
+  .demo-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 3.5rem;
+  }
+}
+
+@keyframes demoFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Left side --- */
+.demo-left {
+  flex-shrink: 0;
+}
+
+@media (min-width: 1024px) {
+  .demo-left {
+    width: 340px;
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+.demo-title {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+/* --- Step list on left --- */
+.demo-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.demo-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.875rem;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.demo-step-item.active {
+  background: oklch(from var(--primary) l c h / 0.06);
+  border-color: oklch(from var(--primary) l c h / 0.2);
+  box-shadow: 0 0 24px oklch(from var(--primary) l c h / 0.06);
+}
+
+.demo-step-item.completed {
+  opacity: 0.55;
+}
+
+.demo-step-number {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  background: oklch(from var(--muted) l c h / 0.5);
+  border: 1px solid oklch(from var(--border) l c h / 0.6);
+  transition: all 0.4s ease;
+}
+
+.demo-step-item.active .demo-step-number {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px oklch(from var(--primary) l c h / 0.3);
+}
+
+.demo-step-item.completed .demo-step-number {
+  background: oklch(0.72 0.17 162 / 0.15);
+  color: oklch(0.72 0.17 162);
+  border-color: oklch(0.72 0.17 162 / 0.3);
+}
+
+.demo-step-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.demo-step-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+  transition: color 0.3s ease;
+}
+
+.demo-step-item.completed .demo-step-title {
+  color: var(--muted-foreground);
+}
+
+.demo-step-desc {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  display: none;
+}
+
+.demo-step-item.active .demo-step-desc {
+  display: block;
+}
+
+/* --- Right side: animation area --- */
+.demo-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+/* Step indicator above animation */
+.demo-step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.25rem;
+}
+
+.demo-step-indicator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  background: oklch(from var(--primary) l c h / 0.1);
+  border: 1px solid oklch(from var(--primary) l c h / 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.demo-step-indicator-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: stepPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes stepPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    box-shadow: 0 0 0 0 oklch(from var(--primary) l c h / 0.4);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 4px oklch(from var(--primary) l c h / 0);
+  }
+}
+
+.demo-step-indicator-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+/* ==============================
+   CARDS MODE — Original Layout
+   ============================== */
+
+.cards-layout {
+  animation: cardsReveal 0.7s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@keyframes cardsReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section header */
+.section-header {
+  max-width: 32rem;
+  margin: 0 auto;
+  text-align: center;
 }
 
 /* Steps grid */
@@ -104,7 +323,33 @@
   border: 1px solid oklch(from var(--border) l c h / 0.5);
   background: oklch(from var(--card) l c h / 0.6);
   text-align: center;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+  animation: cardFadeUp 0.5s ease-out both;
+}
+
+.step-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.step-card:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.step-card:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .step-card:hover {
@@ -135,7 +380,11 @@
   position: absolute;
   inset: 6px;
   border-radius: 0.75rem;
-  background: linear-gradient(to bottom right, oklch(from var(--primary) l c h / 0.12), oklch(from var(--primary) l c h / 0.08));
+  background: linear-gradient(
+    to bottom right,
+    oklch(from var(--primary) l c h / 0.12),
+    oklch(from var(--primary) l c h / 0.08)
+  );
   box-shadow: inset 0 0 0 1px oklch(from var(--primary) l c h / 0.15);
 }
 

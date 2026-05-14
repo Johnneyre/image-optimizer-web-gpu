@@ -1,0 +1,128 @@
+<div class="demo-container">
+  <!-- Header Bar -->
+  <div class="demo-header">
+    <div class="demo-header-brand">
+      <div class="demo-logo-icon">
+        <svg class="demo-logo-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 10V3L4 14h7v7l9-11h-7z"
+          />
+        </svg>
+      </div>
+      <span class="demo-brand-name">Optimizador de Imagen</span>
+    </div>
+    <div class="demo-hw-status">
+      <span class="demo-status-dot"></span>
+      <span>WebGPU Activo</span>
+    </div>
+  </div>
+
+  <!-- Scene: Upload -->
+  <div
+    class="demo-scene"
+    [class.scene-active]="activeScene() === 'upload'"
+    [class.scene-hidden]="activeScene() !== 'upload'"
+  >
+    <div class="demo-scene-inner demo-tech-grid">
+      <div class="demo-upload-zone" [class.hovered]="uploadHovered()">
+        <div class="demo-upload-icon-wrap">
+          <svg class="demo-upload-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+            />
+          </svg>
+        </div>
+        <div class="demo-upload-text">
+          <h3 class="demo-upload-title">Subir Imagen</h3>
+          <p class="demo-upload-desc">Soporta JPG, PNG, WebP</p>
+        </div>
+        <div class="demo-upload-btn">Seleccionar Archivo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scene: Editor -->
+  <div
+    class="demo-scene"
+    [class.scene-active]="activeScene() === 'editor'"
+    [class.scene-hidden]="activeScene() !== 'editor'"
+  >
+    <!-- Original image (blurred background) -->
+    <img src="assets/demo-landscape.png" class="demo-img demo-img-original" alt="" aria-hidden="true" />
+
+    <!-- Optimized image with clip-path reveal -->
+    <div
+      class="demo-optimized-wrap"
+      [style.clip-path]="'polygon(0 0, ' + scanPos() + '% 0, ' + scanPos() + '% 100%, 0 100%)'"
+      [style.transition]="wrapperTransition()"
+    >
+      <img src="assets/demo-landscape.png" class="demo-img" alt="" aria-hidden="true" />
+      <div class="demo-optimized-tint"></div>
+    </div>
+
+    <!-- Scanline -->
+    @if (showScanline()) {
+      <div
+        class="demo-scanline"
+        [style.left.%]="scanPos()"
+        [style.transition]="scanlineTransition()"
+      ></div>
+    }
+
+    <!-- Label: Original -->
+    <div class="demo-label demo-label-left" [class.show]="showLabelLeft()">
+      <p class="demo-label-tag">Original</p>
+      <p class="demo-label-value">5.8 MB</p>
+      <p class="demo-label-note note-warn">Formato Pesado</p>
+    </div>
+
+    <!-- Label: Optimized -->
+    <div class="demo-label demo-label-right" [class.show]="showLabelRight()">
+      <div class="demo-label-tag-row">
+        <p class="demo-label-tag tag-accent">Optimizado</p>
+        <span class="demo-label-badge">-80%</span>
+      </div>
+      <p class="demo-label-value">1.2 MB</p>
+      <p class="demo-label-note note-success">Calidad HD</p>
+    </div>
+
+    <!-- Download button -->
+    <div class="demo-dl-wrap" [class.show]="showDownload()" [class.glow]="downloadGlow()">
+      <button class="demo-dl-btn" type="button" tabindex="-1">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+          />
+        </svg>
+        Descargar Imagen
+      </button>
+    </div>
+  </div>
+
+  <!-- Simulated Cursor -->
+  <svg
+    class="demo-cursor"
+    [class.clicking]="cursorClicking()"
+    [style.top.%]="cursorTop()"
+    [style.left.%]="cursorLeft()"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M4.322 1.584L20.45 9.48c2.16 1.058 1.978 4.204-.493 4.981l-5.328 1.675a1.75 1.75 0 00-.747.59l-2.352 3.89c-1.308 2.164-4.647 1.643-5.251-.814L2.247 3.408C1.725 1.283 3.83-.09 5.864.906L4.322 1.584z"
+      fill="white"
+      stroke="oklch(0.21 0.03 255)"
+      stroke-width="1.5"
+    />
+  </svg>
+</div>

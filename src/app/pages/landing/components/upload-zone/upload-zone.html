@@ -36,28 +36,23 @@
           @if (isDragging()) {
             Suelta tu imagen aquí
           } @else {
-            Arrastra una imagen o haz clic para seleccionar
+            Coloca tu imagen aquí
           }
         </h3>
-        <p class="upload-subtitle">
-          La imagen se procesa <span class="upload-subtitle-highlight">100% local</span> en tu GPU. Nada se sube a ningún servidor.
-        </p>
+        <p class="upload-subtitle">O haz clic para seleccionar en tus archivos</p>
       </div>
 
       <!-- Format tags -->
       <div class="upload-formats">
         @for (format of formats; track format) {
           <span class="upload-format-tag">
-            <lucide-icon [img]="icons.FileImage" [size]="12" />
+            <lucide-icon [img]="icons.FileImage" [size]="17" />
             {{ format }}
           </span>
         }
       </div>
     </div>
   </button>
-
-  <!-- Hint -->
-  <p class="upload-hint">Tamaño máximo recomendado: 50 MB · Resolución ilimitada</p>
 
   <!-- Warning -->
   @if (isSupported() === false) {
@@ -68,11 +63,5 @@
   }
 
   <!-- Hidden file input -->
-  <input
-    #fileInput
-    type="file"
-    accept="image/*"
-    class="sr-only"
-    (change)="onFileSelect($event)"
-  />
+  <input #fileInput type="file" accept="image/*" class="sr-only" (change)="onFileSelect($event)" />
 </div>

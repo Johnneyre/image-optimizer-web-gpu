@@ -1,8 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { ImageProcessingService } from '../../services/image-processing.service';
-import { ThemeService } from '../../services/theme.service';
-import { FeaturesSectionComponent } from '../../components/features-section/features-section';
+import { ImageProcessingService } from '@services/image-processing.service';
+import { ThemeService } from '@services/theme.service';
 import { HeroSectionComponent } from './components/hero-section/hero-section';
 import { UploadZoneComponent } from './components/upload-zone/upload-zone';
 import { StatsSectionComponent } from './components/stats-section/stats-section';
@@ -12,7 +11,6 @@ import { SiteFooterComponent } from './components/site-footer/site-footer';
 @Component({
   selector: 'app-landing',
   imports: [
-    FeaturesSectionComponent,
     HeroSectionComponent,
     UploadZoneComponent,
     StatsSectionComponent,

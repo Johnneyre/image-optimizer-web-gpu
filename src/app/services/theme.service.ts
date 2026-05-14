@@ -16,12 +16,12 @@ export class ThemeService {
       const savedTheme = localStorage.getItem('theme') as Theme | null;
       if (savedTheme) {
         this.theme.set(savedTheme);
-      } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      } else if (globalThis.matchMedia('(prefers-color-scheme: light)').matches) {
         this.theme.set('light');
       }
 
       // Listen for system theme changes
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         if (!localStorage.getItem('theme')) {
           this.theme.set(e.matches ? 'dark' : 'light');
         }

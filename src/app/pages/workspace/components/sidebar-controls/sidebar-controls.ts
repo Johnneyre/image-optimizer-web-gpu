@@ -118,17 +118,17 @@ export class SidebarControlsComponent {
   }
 
   onQualityChange(event: Event): void {
-    const value = parseInt((event.target as HTMLInputElement).value, 10);
+    const value = Number.parseInt((event.target as HTMLInputElement).value, 10);
     this.qualityChange.emit(value);
   }
 
   onBrightnessChange(event: Event): void {
-    const value = parseFloat((event.target as HTMLInputElement).value);
+    const value = Number.parseFloat((event.target as HTMLInputElement).value);
     this.brightnessChange.emit(value);
   }
 
   onContrastChange(event: Event): void {
-    const value = parseFloat((event.target as HTMLInputElement).value);
+    const value = Number.parseFloat((event.target as HTMLInputElement).value);
     this.contrastChange.emit(value);
   }
 

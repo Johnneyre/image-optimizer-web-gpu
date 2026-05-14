@@ -1,14 +1,14 @@
 import { Component, signal, computed, inject, afterNextRender } from '@angular/core';
 import { Router } from '@angular/router';
 import { LucideAngularModule, AlertCircle } from 'lucide-angular';
-import { ImageProcessingService } from '../../services/image-processing.service';
-import { ThemeService } from '../../services/theme.service';
-import { ImageComparisonComponent } from '../../components/image-comparison/image-comparison';
+import { ImageProcessingService } from '@services/image-processing.service';
+import { ThemeService } from '@services/theme.service';
+import { ImageComparisonComponent } from './components/image-comparison/image-comparison';
 import {
   SidebarControlsComponent,
   DownloadRequest,
-} from '../../components/sidebar-controls/sidebar-controls';
-import { DownloadOverlayComponent } from '../../components/download-overlay/download-overlay';
+} from './components/sidebar-controls/sidebar-controls';
+import { DownloadOverlayComponent } from './components/download-overlay/download-overlay';
 
 @Component({
   selector: 'app-workspace',
