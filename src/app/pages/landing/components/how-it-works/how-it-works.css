@@ -71,6 +71,7 @@
   pointer-events: none;
   z-index: 0;
   visibility: hidden;
+  position: absolute;
 }
 
 @media (min-width: 1024px) {
@@ -178,6 +179,7 @@
   pointer-events: none;
   z-index: 0;
   visibility: hidden;
+  position: absolute;
 }
 
 .cards-layout.phase-transitioning {
