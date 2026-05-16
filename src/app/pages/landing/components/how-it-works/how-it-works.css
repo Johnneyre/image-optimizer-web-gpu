@@ -6,14 +6,14 @@
   position: relative;
   max-width: 80rem;
   margin: 0 auto;
-  padding: 5rem 1rem;
+  padding: 2rem 1rem 1rem;
   display: grid;
   grid-template-areas: 'content';
 }
 
 @media (min-width: 640px) {
   .how-it-works-section {
-    padding: 5rem 1.5rem;
+    padding: 3rem 2.5rem 2rem;
   }
 }
 
@@ -24,56 +24,22 @@
 }
 
 /* ==============================
-   SHARED ELEMENTS
-   ============================== */
-
-/* Section badge */
-.section-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  border: 1px solid oklch(from var(--border) l c h / 0.6);
-  background: oklch(from var(--muted) l c h / 0.4);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--muted-foreground);
-}
-
-.section-badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background: var(--primary);
-}
-
-.section-title {
-  margin-top: 1rem;
-  font-size: 1.875rem;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  color: var(--foreground);
-  text-wrap: balance;
-}
-
-@media (min-width: 640px) {
-  .section-title {
-    font-size: 2.25rem;
-  }
-}
-
-/* ==============================
-   DEMO MODE — Split Layout
+   DEMO MODE — Phase transitions
    ============================== */
 
 .demo-layout {
   grid-area: content;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 1.5rem;
   opacity: 1;
   transition: opacity 0.5s ease-out;
+}
+
+@media (min-width: 640px) {
+  .demo-layout {
+    gap: 2rem;
+  }
 }
 
 .demo-layout.phase-demo {
@@ -115,31 +81,7 @@
   }
 }
 
-/* --- Left side --- */
-.demo-left {
-  flex-shrink: 0;
-}
-
-@media (min-width: 1024px) {
-  .demo-left {
-    width: 340px;
-    position: sticky;
-    top: 6rem;
-  }
-}
-
-.demo-title {
-  text-align: left;
-  margin-bottom: 2rem;
-}
-
-/* --- Step list on left --- */
-.demo-steps-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
+/* --- Step item states --- */
 .demo-step-item {
   display: flex;
   align-items: flex-start;
@@ -161,16 +103,20 @@
   opacity: 0.55;
 }
 
+.demo-step-item.completed .demo-step-title {
+  color: var(--muted-foreground);
+}
+
 .demo-step-number {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--muted-foreground);
@@ -187,33 +133,12 @@
 }
 
 .demo-step-item.completed .demo-step-number {
-  background: oklch(0.72 0.17 162 / 0.15);
-  color: oklch(0.72 0.17 162);
-  border-color: oklch(0.72 0.17 162 / 0.3);
-}
-
-.demo-step-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-
-.demo-step-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--foreground);
-  transition: color 0.3s ease;
-}
-
-.demo-step-item.completed .demo-step-title {
-  color: var(--muted-foreground);
+  background: oklch(from var(--success) l c h / 0.15);
+  color: var(--success);
+  border-color: oklch(from var(--success) l c h / 0.3);
 }
 
 .demo-step-desc {
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: var(--muted-foreground);
   display: none;
 }
 
@@ -221,44 +146,8 @@
   display: block;
 }
 
-/* --- Right side: animation area --- */
-.demo-right {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
-
-/* Step indicator above animation */
-.demo-step-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0 0.25rem;
-}
-
-.demo-step-indicator-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 9999px;
-  background: oklch(from var(--primary) l c h / 0.1);
-  border: 1px solid oklch(from var(--primary) l c h / 0.2);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: var(--primary);
-  white-space: nowrap;
-}
-
+/* Pulse animation for step indicator */
 .demo-step-indicator-pulse {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--primary);
   animation: stepPulse 1.2s ease-in-out infinite;
 }
 
@@ -274,14 +163,8 @@
   }
 }
 
-.demo-step-indicator-title {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--foreground);
-}
-
 /* ==============================
-   CARDS MODE — Original Layout
+   CARDS MODE — Phase transitions
    ============================== */
 
 .cards-layout {
@@ -311,7 +194,6 @@
   visibility: visible;
 }
 
-/* Header fades in smoothly */
 .cards-layout.phase-cards .section-header {
   animation: smoothFadeIn 0.7s ease-out both;
 }
@@ -322,46 +204,6 @@
   }
   to {
     opacity: 1;
-  }
-}
-
-/* Section header */
-.section-header {
-  max-width: 32rem;
-  margin: 0 auto;
-  text-align: center;
-}
-
-/* Steps grid */
-.steps-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  margin-top: 3.5rem;
-}
-
-@media (min-width: 768px) {
-  .steps-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Connector line */
-.steps-connector {
-  display: none;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 52px;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--border), transparent);
-  pointer-events: none;
-}
-
-@media (min-width: 768px) {
-  .steps-connector {
-    display: block;
   }
 }
 
@@ -399,12 +241,6 @@
 }
 
 /* Step icon */
-.step-icon-wrapper {
-  position: relative;
-  display: flex;
-  justify-content: center;
-}
-
 .step-icon-outer {
   position: relative;
   display: flex;
@@ -419,38 +255,4 @@
     oklch(from var(--primary) l c h / 0.08)
   );
   box-shadow: inset 0 0 0 1px var(--border);
-}
-
-.step-icon-outer lucide-icon {
-  position: relative;
-  color: var(--primary);
-}
-
-/* Step number */
-.step-number {
-  margin-top: 1.25rem;
-  margin-bottom: 0;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: var(--muted-foreground);
-}
-
-/* Step title */
-.step-title {
-  margin-top: 0.375rem;
-  margin-bottom: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-/* Step description */
-.step-description {
-  max-width: 20rem;
-  margin: 0.5rem auto 0;
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: var(--muted-foreground);
 }

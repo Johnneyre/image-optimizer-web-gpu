@@ -1,4 +1,6 @@
-<div class="upload-wrapper">
+<div
+  class="upload-wrapper relative max-w-lg sm:max-w-xl md:max-w-3xl mx-auto w-full px-4 sm:px-4 lg:px-0"
+>
   <!-- Glow effect -->
   <div class="upload-glow" aria-hidden="true"></div>
 
@@ -19,34 +21,41 @@
     <span class="upload-corner upload-corner-bl"></span>
     <span class="upload-corner upload-corner-br"></span>
 
-    <div class="upload-content">
+    <div class="flex flex-col items-center justify-center gap-5 text-center">
       <!-- Icon -->
-      <div class="upload-icon-wrapper">
+      <div class="upload-icon-wrapper relative">
         <div class="upload-icon-bg">
-          <lucide-icon [img]="icons.Upload" [size]="32" [strokeWidth]="2" />
+          <lucide-icon
+            [img]="icons.Upload"
+            [size]="32"
+            [strokeWidth]="2"
+            class="text-(--primary)"
+          />
         </div>
         <span class="upload-icon-badge">
-          <lucide-icon [img]="icons.ImageIcon" [size]="14" />
+          <lucide-icon [img]="icons.ImageIcon" [size]="14" class="text-(--primary-foreground)" />
         </span>
       </div>
 
       <!-- Text -->
-      <div class="upload-text-container">
-        <h3 class="upload-title">
+      <div class="flex flex-col gap-2">
+        <h3 class="m-0 text-xl sm:text-2xl font-semibold tracking-tight text-(--foreground)">
           @if (isDragging()) {
             Suelta tu imagen aquí
           } @else {
             Coloca tu imagen aquí
           }
         </h3>
-        <p class="upload-subtitle">O haz clic para seleccionar en tus archivos</p>
+        <p class="m-0 text-base text-(--muted-foreground)">
+          O haz clic para seleccionar en tus archivos
+        </p>
       </div>
 
       <!-- Format tags -->
-      <div class="upload-formats">
+      <div class="flex flex-wrap items-center justify-center gap-2 pt-2">
         @for (format of formats; track format) {
           <span class="upload-format-tag">
-            <lucide-icon [img]="icons.FileImage" [size]="17" />
+            <lucide-icon [img]="icons.FileImage" [size]="17" class="text-(--muted-foreground)" />
             {{ format }}
           </span>
         }
@@ -56,9 +65,17 @@
 
   <!-- Warning -->
   @if (isSupported() === false) {
-    <div class="upload-warning">
-      <lucide-icon [img]="icons.AlertCircle" [size]="16" />
-      <p>Tu navegador no soporta WebGPU. Prueba con Chrome 113+ o Edge 113+.</p>
+    <div
+      class="flex items-center gap-2 mt-4 py-2 px-4 rounded-lg bg-[oklch(0.55_0.2_25/0.1)] border border-[oklch(0.55_0.2_25/0.3)]"
+    >
+      <lucide-icon
+        [img]="icons.AlertCircle"
+        [size]="16"
+        class="text-[oklch(0.65_0.2_25)] shrink-0"
+      />
+      <p class="m-0 text-[0.8rem] text-[oklch(0.65_0.2_25)]">
+        Tu navegador no soporta WebGPU. Prueba con Chrome 113+ o Edge 113+.
+      </p>
     </div>
   }
 

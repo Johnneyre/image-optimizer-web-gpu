@@ -1,8 +1,12 @@
-<div class="stats-section">
-  @for (stat of stats; track stat.label) {
-    <div class="stat-card">
-      <p class="stat-value">{{ stat.value }}</p>
-      <p class="stat-label">{{ stat.label }}</p>
+<div class="max-w-3xl mx-auto mt-8 sm:mt-14 grid grid-cols-3 gap-2 px-4 sm:gap-6 sm:px-6 lg:px-8">
+  @for (stat of stats; track stat.label; let i = $index) {
+    <div class="stat-card p-3 sm:p-4" [style.--stat-index]="i">
+      <p
+        class="m-0 font-mono text-lg sm:text-2xl md:text-3xl font-semibold tracking-tight text-(--foreground)"
+      >
+        {{ stat.value }}
+      </p>
+      <p class="mt-1 mb-0 text-xs sm:text-sm text-(--muted-foreground)">{{ stat.label }}</p>
     </div>
   }
 </div>

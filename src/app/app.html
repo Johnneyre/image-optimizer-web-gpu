@@ -1,8 +1,12 @@
 <!-- Layout Principal con Tema Dinámico -->
-<div
-  class="app-shell"
-  [class.dark]="theme() === 'dark'"
->
+<div class="app-shell" [class.dark]="theme() === 'dark'">
+  <a
+    href="#main-content"
+    class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-100 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-(--primary) focus:text-(--primary-foreground) focus:font-medium focus:outline-none focus:ring-2 focus:ring-(--ring)"
+  >
+    Saltar al contenido principal
+  </a>
+
   <!-- Header -->
   <app-header
     [theme]="theme()"
@@ -17,12 +21,14 @@
 
   <!-- Error Toast -->
   @if (lastError()) {
-    <div class="fixed bottom-4 right-4 max-w-sm bg-red-500/10 border border-red-500/30 rounded-lg p-4 z-50">
+    <div
+      class="fixed bottom-4 right-4 max-w-sm bg-[oklch(from_var(--destructive)_l_c_h/0.1)] border border-[oklch(from_var(--destructive)_l_c_h/0.3)] rounded-lg p-4 z-50"
+    >
       <div class="flex items-start gap-3">
-        <lucide-icon [img]="icons.AlertCircle" class="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+        <lucide-icon [img]="icons.AlertCircle" class="w-5 h-5 text-(--destructive) shrink-0 mt-0.5" />
         <div>
-          <p class="text-sm font-medium text-red-500">Error</p>
-          <p class="text-sm text-red-400 mt-1">{{ lastError() }}</p>
+          <p class="text-sm font-medium text-(--destructive)">Error</p>
+          <p class="text-sm text-[oklch(from_var(--destructive)_l_c_h/0.8)] mt-1">{{ lastError() }}</p>
         </div>
       </div>
     </div>

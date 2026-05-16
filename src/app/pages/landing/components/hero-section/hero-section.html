@@ -1,31 +1,41 @@
-<section class="hero-section">
-  <div class="hero-content">
+<section class="relative pt-6 px-4 sm:pt-16 sm:px-6 lg:pt-20 lg:px-8">
+  <div class="max-w-3xl mx-auto text-center">
     <!-- Title -->
-    <h1 class="hero-title">
+    <h1
+      class="text-3xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-(--foreground) text-balance"
+    >
       Optimiza tus imágenes
-      <span class="hero-title-gradient">en segundos</span>
+      <span class="block text-(--primary)">en segundos</span>
     </h1>
 
     <!-- Subtitle -->
-    <p class="hero-subtitle">
+    <p
+      class="max-w-2xl mx-auto mt-5 text-base sm:text-lg leading-relaxed text-(--muted-foreground) text-pretty"
+    >
       Reduce el tamaño de tus imágenes hasta 80% manteniendo la calidad. Todo ocurre en tu
       navegador, así que tus imagenes nunca salen de tu computadora.
     </p>
 
     <!-- Features list -->
-    <div class="hero-features">
-      <span class="hero-feature-item">
-        <lucide-icon [img]="icons.Zap" [size]="16" />
+    <div
+      class="hero-features flex flex-wrap items-center justify-center gap-y-3 gap-x-6 mt-7 text-sm text-(--muted-foreground)"
+    >
+      <span class="hero-feature-item inline-flex items-center gap-2">
+        <lucide-icon [img]="icons.Zap" [size]="16" class="text-(--primary)" />
         <span>Procesamiento en segundos</span>
       </span>
-      <span class="hero-feature-dot"></span>
-      <span class="hero-feature-item">
-        <lucide-icon [img]="icons.Lock" [size]="16" />
+      <span
+        class="hero-feature-dot hidden sm:inline-block w-1 h-1 rounded-full bg-(--border)"
+      ></span>
+      <span class="hero-feature-item inline-flex items-center gap-2">
+        <lucide-icon [img]="icons.Lock" [size]="16" class="text-(--primary)" />
         <span>100% local y privado</span>
       </span>
-      <span class="hero-feature-dot"></span>
-      <span class="hero-feature-item">
-        <lucide-icon [img]="icons.Sparkles" [size]="16" />
+      <span
+        class="hero-feature-dot hidden sm:inline-block w-1 h-1 rounded-full bg-(--border)"
+      ></span>
+      <span class="hero-feature-item inline-flex items-center gap-2">
+        <lucide-icon [img]="icons.Sparkles" [size]="16" class="text-(--primary)" />
         <span>WebP · JPEG · PNG</span>
       </span>
     </div>

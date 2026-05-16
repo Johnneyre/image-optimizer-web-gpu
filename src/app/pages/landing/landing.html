@@ -1,6 +1,10 @@
-<div class="landing-page" [class.dark]="theme() === 'dark'">
+<main
+  id="main-content"
+  class="landing-page min-h-[calc(100dvh-57px)] overflow-x-hidden bg-(--background) text-(--foreground)"
+  [class.dark]="theme() === 'dark'"
+>
   <!-- Unified hero + upload background -->
-  <div class="landing-hero-area">
+  <div class="landing-hero-area relative isolate pb-16">
     <!-- Background grid -->
     <div class="landing-grid-bg" aria-hidden="true"></div>
 
@@ -23,9 +27,9 @@
   @defer (on viewport) {
     <app-how-it-works />
   } @placeholder {
-    <div class="how-it-works-placeholder"></div>
+    <div class="min-h-[500px]"></div>
   }
 
   <!-- Footer -->
   <app-site-footer />
-</div>
+</main>

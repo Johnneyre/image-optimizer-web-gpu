@@ -7,15 +7,21 @@
     [class.phase-hidden]="phase() === 'cards'"
   >
     <!-- Left side: title + step info -->
-    <div class="demo-left">
-      <div class="section-badge">
-        <span class="section-badge-dot"></span>
+    <div class="demo-left shrink-0 lg:w-[340px] lg:sticky lg:top-24">
+      <div
+        class="section-badge inline-flex items-center gap-2 py-1 px-3 rounded-full border border-(--border)/60 bg-(--muted)/40 text-xs font-medium text-(--muted-foreground)"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-(--primary)"></span>
         <span>Cómo funciona</span>
       </div>
-      <h2 class="section-title demo-title">Optimización en tres simples pasos</h2>
+      <h2
+        class="mt-4 mb-6 sm:mb-8 text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-(--foreground) text-balance text-left"
+      >
+        Optimización en tres simples pasos
+      </h2>
 
       <!-- Step indicators -->
-      <div class="demo-steps-list">
+      <div class="flex flex-col gap-1">
         @for (step of steps; track step.n; let i = $index) {
           <div
             class="demo-step-item"
@@ -40,9 +46,14 @@
                 {{ step.n }}
               }
             </div>
-            <div class="demo-step-info">
-              <span class="demo-step-title">{{ step.title }}</span>
-              <span class="demo-step-desc">{{ step.description }}</span>
+            <div class="flex flex-col gap-0.5 min-w-0">
+              <span class="demo-step-title text-[0.95rem] font-semibold text-(--foreground)">{{
+                step.title
+              }}</span>
+              <span
+                class="demo-step-desc text-[0.8rem] leading-relaxed text-(--muted-foreground)"
+                >{{ step.description }}</span
+              >
             </div>
           </div>
         }
@@ -50,14 +61,16 @@
     </div>
 
     <!-- Right side: animation -->
-    <div class="demo-right">
+    <div class="flex-1 min-w-0 flex flex-col gap-3.5">
       <!-- Current step indicator above animation -->
-      <div class="demo-step-indicator">
-        <span class="demo-step-indicator-badge">
-          <span class="demo-step-indicator-pulse"></span>
+      <div class="flex items-center gap-3 px-1">
+        <span
+          class="demo-step-indicator-badge inline-flex items-center gap-2 py-1.5 px-3 rounded-full bg-(--primary)/10 border border-(--primary)/20 font-mono text-xs font-semibold tracking-wide text-(--primary) whitespace-nowrap"
+        >
+          <span class="demo-step-indicator-pulse w-1.5 h-1.5 rounded-full bg-(--primary)"></span>
           Paso #{{ currentStep() }}
         </span>
-        <span class="demo-step-indicator-title">{{ activeStepData.title }}</span>
+        <span class="text-sm font-medium text-(--foreground)">{{ activeStepData.title }}</span>
       </div>
 
       <app-hero-demo (stepChange)="onStepChange($event)" (completed)="onDemoCompleted()" />
@@ -72,37 +85,52 @@
     [class.phase-hidden]="phase() === 'demo'"
   >
     <!-- Section header -->
-    <div class="section-header">
-      <div class="section-badge">
-        <span class="section-badge-dot"></span>
+    <div class="section-header max-w-lg mx-auto text-center">
+      <div
+        class="section-badge inline-flex items-center gap-2 py-1 px-3 rounded-full border border-(--border)/60 bg-(--muted)/40 text-xs font-medium text-(--muted-foreground)"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-(--primary)"></span>
         <span>Cómo funciona</span>
       </div>
-      <h2 class="section-title">Optimización en tres simples pasos</h2>
+      <h2
+        class="mt-4 text-3xl sm:text-4xl font-semibold tracking-tight text-(--foreground) text-balance leading-[3.2rem]"
+      >
+        Optimización en tres simples pasos
+      </h2>
     </div>
 
     <!-- Steps grid -->
-    <div class="steps-grid">
-      <!-- Connector line -->
-      <div class="steps-connector" aria-hidden="true"></div>
-
+    <div
+      class="steps-grid relative grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mt-10 sm:mt-14 max-w-sm sm:max-w-3xl lg:max-w-none mx-auto"
+    >
       @for (step of steps; track step.n; let i = $index) {
         <div class="step-card" [style.--card-index]="i">
           <!-- Icon -->
-          <div class="step-icon-wrapper">
+          <div class="relative flex justify-center">
             <div class="step-icon-outer">
-              <div class="step-icon-inner"></div>
-              <lucide-icon [img]="step.icon" [size]="24" [strokeWidth]="2" />
+              <lucide-icon
+                [img]="step.icon"
+                [size]="24"
+                [strokeWidth]="2"
+                class="relative text-(--primary)"
+              />
             </div>
           </div>
 
           <!-- Number -->
-          <p class="step-number">PASO {{ step.n }}</p>
+          <p
+            class="mt-5 mb-0 font-mono text-[0.85rem] font-medium tracking-widest text-(--muted-foreground)"
+          >
+            PASO {{ step.n }}
+          </p>
 
           <!-- Title -->
-          <h3 class="step-title">{{ step.title }}</h3>
+          <h3 class="mt-1.5 mb-0 text-lg font-semibold text-(--foreground)">{{ step.title }}</h3>
 
           <!-- Description -->
-          <p class="step-description">{{ step.description }}</p>
+          <p class="max-w-xs mx-auto mt-2 mb-0 text-sm leading-relaxed text-(--muted-foreground)">
+            {{ step.description }}
+          </p>
         </div>
       }
     </div>

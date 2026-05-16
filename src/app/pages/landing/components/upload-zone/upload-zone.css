@@ -1,16 +1,15 @@
 :host {
   display: block;
-  margin-top: 3.5rem;
+  margin-top: 2rem;
 }
 
-.upload-wrapper {
-  position: relative;
-  max-width: 48rem;
-  margin: 0 auto;
-  width: 100%;
+@media (min-width: 640px) {
+  :host {
+    margin-top: 3.5rem;
+  }
 }
 
-/* Upload glow */
+/* Upload glow - requires custom CSS for oklch gradients and blur */
 .upload-glow {
   position: absolute;
   inset: -1.5rem;
@@ -27,7 +26,7 @@
   transition: opacity 0.3s ease;
 }
 
-/* Upload button */
+/* Upload button - complex hover/focus/dragging states */
 .upload-zone {
   position: relative;
   display: block;
@@ -67,7 +66,7 @@
   box-shadow: 0 25px 50px -12px oklch(from var(--primary) l c h / 0.15);
 }
 
-/* Corner accents */
+/* Corner accents with hover/dragging animations */
 .upload-corner {
   position: absolute;
   width: 24px;
@@ -149,21 +148,7 @@
   transform: translate(4px, 4px);
 }
 
-/* Upload content */
-.upload-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  text-align: center;
-}
-
-/* Upload icon */
-.upload-icon-wrapper {
-  position: relative;
-}
-
+/* Upload icon with gradient background */
 .upload-icon-bg {
   display: flex;
   align-items: center;
@@ -190,10 +175,6 @@
   box-shadow: inset 0 0 0 1px oklch(from var(--primary) l c h / 0.5);
 }
 
-.upload-icon-bg lucide-icon {
-  color: var(--primary);
-}
-
 .upload-icon-badge {
   position: absolute;
   bottom: -4px;
@@ -205,7 +186,6 @@
   height: 28px;
   border-radius: 9999px;
   background: var(--primary);
-  color: var(--primary-foreground);
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -214,47 +194,7 @@
   transform: scale(1.1);
 }
 
-.upload-icon-badge lucide-icon {
-  color: var(--primary-foreground);
-}
-
-/* Upload text */
-.upload-text-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.upload-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  color: var(--foreground);
-  margin: 0;
-}
-
-@media (min-width: 640px) {
-  .upload-title {
-    font-size: 1.5rem;
-  }
-}
-
-.upload-subtitle {
-  font-size: 1rem;
-  color: var(--muted-foreground);
-  margin: 0;
-}
-
 /* Format tags */
-.upload-formats {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding-top: 0.5rem;
-}
-
 .upload-format-tag {
   display: inline-flex;
   align-items: center;
@@ -264,7 +204,7 @@
   border: 1px solid oklch(from var(--border) l c h / 0.6);
   background: oklch(from var(--muted) l c h / 0.4);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--muted-foreground);
   transition: all 0.2s ease;
@@ -272,44 +212,4 @@
 
 .upload-zone:hover .upload-format-tag {
   border-color: oklch(from var(--primary) l c h / 0.25);
-}
-
-.upload-format-tag lucide-icon {
-  color: var(--muted-foreground);
-}
-
-/* WebGPU warning */
-.upload-warning {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  background: oklch(0.55 0.2 25 / 0.1);
-  border: 1px solid oklch(0.55 0.2 25 / 0.3);
-}
-
-.upload-warning lucide-icon {
-  color: oklch(0.65 0.2 25);
-  flex-shrink: 0;
-}
-
-.upload-warning p {
-  margin: 0;
-  font-size: 0.8rem;
-  color: oklch(0.65 0.2 25);
-}
-
-/* Screen reader only */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
 }

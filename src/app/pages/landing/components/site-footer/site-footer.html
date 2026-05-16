@@ -1,17 +1,25 @@
-<footer class="footer-section">
-  <div class="footer-container">
+<footer
+  class="footer-section border-t border-[oklch(from_var(--border)_l_c_h/0.6)] bg-[oklch(from_var(--background)_l_c_h/0.6)]"
+>
+  <div
+    class="max-w-7xl mx-auto py-8 px-4 flex flex-col items-center justify-between gap-4 sm:flex-row sm:px-6 lg:px-8"
+  >
     <!-- Brand -->
-    <div class="footer-brand">
-      <div class="footer-logo">
-        <lucide-icon [img]="icons.Sparkles" [size]="14" [strokeWidth]="2" />
+    <div class="flex items-center gap-2.5">
+      <div
+        class="flex items-center justify-center w-7 h-7 rounded-lg bg-linear-to-br from-(--primary) to-[oklch(from_var(--primary)_l_c_h/0.7)]"
+      >
+        <lucide-icon [img]="icons.Sparkles" [size]="14" [strokeWidth]="2" class="text-white" />
       </div>
       <div>
-        <p class="footer-name">ImageOptimize</p>
-        <p class="footer-tagline">Procesamiento 100% local</p>
+        <p class="m-0 text-sm font-medium text-(--foreground)">ImageOptimize</p>
+        <p class="m-0 text-xs text-(--muted-foreground)">Procesamiento 100% local</p>
       </div>
     </div>
 
     <!-- Copyright -->
-    <p class="footer-copyright">© {{ currentYear }} ImageOptimize. Todos los derechos reservados.</p>
+    <p class="m-0 text-xs text-(--muted-foreground)">
+      © {{ currentYear }} ImageOptimize. Todos los derechos reservados.
+    </p>
   </div>
 </footer>
