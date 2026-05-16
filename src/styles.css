@@ -5,6 +5,42 @@
 @import 'tailwindcss';
 
 /* ============================================================================
+   Font Definitions
+   ============================================================================ */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/inter-v20-latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./assets/fonts/inter-v20-latin-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./assets/fonts/inter-v20-latin-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/inter-v20-latin-700.woff2') format('woff2');
+}
+
+/* ============================================================================
    CSS Variables - Theme System (OKLCh)
    ============================================================================ */
 
@@ -67,13 +103,15 @@ body {
   padding: 0;
   background-color: var(--background);
   color: var(--foreground);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Prevent text selection on UI elements */
 button,
 label,
-[role="button"] {
+[role='button'] {
   user-select: none;
 }
 
@@ -87,59 +125,10 @@ label,
    Utility Classes
    ============================================================================ */
 
-/* Animated grid background */
-.bg-grid-landing {
-  background-image:
-    linear-gradient(to right, color-mix(in oklch, var(--foreground) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 5%, transparent) 1px, transparent 1px);
-  background-size: 56px 56px;
-}
-
-/* Radial fade mask */
-.mask-radial-fade {
-  mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
-}
-
-/* Float animation */
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-12px); }
-}
-
-.animate-float-slow {
-  animation: float-slow 6s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-float-slow {
-    animation: none;
-  }
-}
-
-/* Text balance utility */
-.text-balance {
-  text-wrap: balance;
-}
-
-.text-pretty {
-  text-wrap: pretty;
-}
-
 /* Backdrop blur utilities */
 .backdrop-blur-sm {
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-}
-
-.backdrop-blur-xl {
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-}
-
-.backdrop-blur-3xl {
-  backdrop-filter: blur(64px);
-  -webkit-backdrop-filter: blur(64px);
 }
 
 /* Screen reader only */
@@ -153,10 +142,4 @@ label,
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
-}
-
-/* Focus visible ring */
-.focus-visible-ring:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--ring), 0 0 0 4px oklch(from var(--ring) l c h / 0.2);
 }
