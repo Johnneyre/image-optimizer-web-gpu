@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { LucideAngularModule, Sparkles, Lock, Zap } from 'lucide-angular';
-import { ThemeService } from '../../../../services/theme.service';
 
 @Component({
   selector: 'app-hero-section',
@@ -10,9 +9,5 @@ import { ThemeService } from '../../../../services/theme.service';
   styleUrl: './hero-section.css',
 })
 export class HeroSectionComponent {
-  private readonly themeService = inject(ThemeService);
-
-  readonly theme = this.themeService.theme;
-
   readonly icons = { Sparkles, Lock, Zap };
 }

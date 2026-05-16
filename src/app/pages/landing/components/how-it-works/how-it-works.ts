@@ -1,13 +1,7 @@
 import { Component, signal } from '@angular/core';
-import { LucideAngularModule, ImageUp, Cpu, Download, LucideIconData } from 'lucide-angular';
+import { LucideAngularModule, ImageUp, Cpu, Download } from 'lucide-angular';
 import { HeroDemoComponent } from '../hero-demo/hero-demo';
-
-interface Step {
-  n: string;
-  icon: LucideIconData;
-  title: string;
-  description: string;
-}
+import type { Step, LayoutPhase } from '@types';
 
 @Component({
   selector: 'app-how-it-works',
@@ -39,8 +33,8 @@ export class HowItWorksComponent {
     },
   ];
 
-  /** Whether the demo animation is currently playing */
-  readonly demoPlaying = signal(true);
+  /** Current layout phase: demo -> transitioning -> cards */
+  readonly phase = signal<LayoutPhase>('demo');
 
   /** Current step shown during the demo (1, 2, or 3) */
   readonly currentStep = signal(1);
@@ -50,7 +44,13 @@ export class HowItWorksComponent {
   }
 
   onDemoCompleted(): void {
-    this.demoPlaying.set(false);
+    // Start transition phase - demo fades out
+    this.phase.set('transitioning');
+
+    // After demo fade out completes, show cards
+    setTimeout(() => {
+      this.phase.set('cards');
+    }, 150);
   }
 
   /** Returns the current step data for the step indicator */

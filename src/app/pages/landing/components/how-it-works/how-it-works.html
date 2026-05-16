@@ -1,104 +1,110 @@
 <section class="how-it-works-section">
   <!-- ===== DEMO MODE: Split layout (left text + right animation) ===== -->
-  @if (demoPlaying()) {
-    <div class="demo-layout">
-      <!-- Left side: title + step info -->
-      <div class="demo-left">
-        <div class="section-badge">
-          <span class="section-badge-dot"></span>
-          <span>Cómo funciona</span>
-        </div>
-        <h2 class="section-title demo-title">Optimización en tres simples pasos</h2>
+  <div
+    class="demo-layout"
+    [class.phase-demo]="phase() === 'demo'"
+    [class.phase-transitioning]="phase() === 'transitioning'"
+    [class.phase-hidden]="phase() === 'cards'"
+  >
+    <!-- Left side: title + step info -->
+    <div class="demo-left">
+      <div class="section-badge">
+        <span class="section-badge-dot"></span>
+        <span>Cómo funciona</span>
+      </div>
+      <h2 class="section-title demo-title">Optimización en tres simples pasos</h2>
 
-        <!-- Step indicators -->
-        <div class="demo-steps-list">
-          @for (step of steps; track step.n; let i = $index) {
-            <div
-              class="demo-step-item"
-              [class.active]="currentStep() === i + 1"
-              [class.completed]="currentStep() > i + 1"
-            >
-              <div class="demo-step-number">
-                @if (currentStep() > i + 1) {
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                } @else {
-                  {{ step.n }}
-                }
-              </div>
-              <div class="demo-step-info">
-                <span class="demo-step-title">{{ step.title }}</span>
-                <span class="demo-step-desc">{{ step.description }}</span>
-              </div>
+      <!-- Step indicators -->
+      <div class="demo-steps-list">
+        @for (step of steps; track step.n; let i = $index) {
+          <div
+            class="demo-step-item"
+            [class.active]="currentStep() === i + 1"
+            [class.completed]="currentStep() > i + 1"
+          >
+            <div class="demo-step-number">
+              @if (currentStep() > i + 1) {
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              } @else {
+                {{ step.n }}
+              }
             </div>
-          }
-        </div>
-      </div>
-
-      <!-- Right side: animation -->
-      <div class="demo-right">
-        <!-- Current step indicator above animation -->
-        <div class="demo-step-indicator">
-          <span class="demo-step-indicator-badge">
-            <span class="demo-step-indicator-pulse"></span>
-            Paso #{{ currentStep() }}
-          </span>
-          <span class="demo-step-indicator-title">{{ activeStepData.title }}</span>
-        </div>
-
-        <app-hero-demo (stepChange)="onStepChange($event)" (completed)="onDemoCompleted()" />
-      </div>
-    </div>
-  }
-
-  <!-- ===== CARDS MODE: Original centered layout ===== -->
-  @if (!demoPlaying()) {
-    <div class="cards-layout">
-      <!-- Section header -->
-      <div class="section-header">
-        <div class="section-badge">
-          <span class="section-badge-dot"></span>
-          <span>Cómo funciona</span>
-        </div>
-        <h2 class="section-title">Optimización en tres simples pasos</h2>
-      </div>
-
-      <!-- Steps grid -->
-      <div class="steps-grid">
-        <!-- Connector line -->
-        <div class="steps-connector" aria-hidden="true"></div>
-
-        @for (step of steps; track step.n) {
-          <div class="step-card">
-            <!-- Icon -->
-            <div class="step-icon-wrapper">
-              <div class="step-icon-outer">
-                <div class="step-icon-inner"></div>
-                <lucide-icon [img]="step.icon" [size]="24" [strokeWidth]="2" />
-              </div>
+            <div class="demo-step-info">
+              <span class="demo-step-title">{{ step.title }}</span>
+              <span class="demo-step-desc">{{ step.description }}</span>
             </div>
-
-            <!-- Number -->
-            <p class="step-number">PASO {{ step.n }}</p>
-
-            <!-- Title -->
-            <h3 class="step-title">{{ step.title }}</h3>
-
-            <!-- Description -->
-            <p class="step-description">{{ step.description }}</p>
           </div>
         }
       </div>
     </div>
-  }
+
+    <!-- Right side: animation -->
+    <div class="demo-right">
+      <!-- Current step indicator above animation -->
+      <div class="demo-step-indicator">
+        <span class="demo-step-indicator-badge">
+          <span class="demo-step-indicator-pulse"></span>
+          Paso #{{ currentStep() }}
+        </span>
+        <span class="demo-step-indicator-title">{{ activeStepData.title }}</span>
+      </div>
+
+      <app-hero-demo (stepChange)="onStepChange($event)" (completed)="onDemoCompleted()" />
+    </div>
+  </div>
+
+  <!-- ===== CARDS MODE: Original centered layout ===== -->
+  <div
+    class="cards-layout"
+    [class.phase-cards]="phase() === 'cards'"
+    [class.phase-transitioning]="phase() === 'transitioning'"
+    [class.phase-hidden]="phase() === 'demo'"
+  >
+    <!-- Section header -->
+    <div class="section-header">
+      <div class="section-badge">
+        <span class="section-badge-dot"></span>
+        <span>Cómo funciona</span>
+      </div>
+      <h2 class="section-title">Optimización en tres simples pasos</h2>
+    </div>
+
+    <!-- Steps grid -->
+    <div class="steps-grid">
+      <!-- Connector line -->
+      <div class="steps-connector" aria-hidden="true"></div>
+
+      @for (step of steps; track step.n; let i = $index) {
+        <div class="step-card" [style.--card-index]="i">
+          <!-- Icon -->
+          <div class="step-icon-wrapper">
+            <div class="step-icon-outer">
+              <div class="step-icon-inner"></div>
+              <lucide-icon [img]="step.icon" [size]="24" [strokeWidth]="2" />
+            </div>
+          </div>
+
+          <!-- Number -->
+          <p class="step-number">PASO {{ step.n }}</p>
+
+          <!-- Title -->
+          <h3 class="step-title">{{ step.title }}</h3>
+
+          <!-- Description -->
+          <p class="step-description">{{ step.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
 </section>

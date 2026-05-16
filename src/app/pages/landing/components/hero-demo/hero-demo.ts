@@ -39,6 +39,8 @@ export class HeroDemoComponent {
   readonly showLabelRight = signal(false);
   readonly showDownload = signal(false);
   readonly downloadGlow = signal(false);
+  readonly downloadHovered = signal(false);
+  readonly scanComplete = signal(false);
 
   constructor() {
     this.destroyRef.onDestroy(() => {
@@ -80,6 +82,8 @@ export class HeroDemoComponent {
     this.showLabelRight.set(false);
     this.showDownload.set(false);
     this.downloadGlow.set(false);
+    this.downloadHovered.set(false);
+    this.scanComplete.set(false);
   }
 
   private async runAnimation(): Promise<void> {
@@ -116,18 +120,21 @@ export class HeroDemoComponent {
     this.activeScene.set('editor');
     await this.sleep(600);
 
-    // Start scan
+    // Start scan from left
     this.showScanline.set(true);
     this.setScanPosition(0);
     await this.sleep(50);
 
-    // Sweep right
+    // Sweep right (reveal original with filter from left)
     this.setScanPosition(100, '1.5s', 'cubic-bezier(0.8, 0, 0.2, 1)');
     await this.sleep(1400);
 
-    // Return to center
+    // Return to center (50 = left is original with filter, right is optimized clear)
     this.setScanPosition(50, '1.2s', 'cubic-bezier(0.25, 1, 0.5, 1)');
     await this.sleep(1100);
+
+    // Mark scan as complete
+    this.scanComplete.set(true);
 
     // Show labels
     this.showLabelLeft.set(true);
@@ -137,13 +144,29 @@ export class HeroDemoComponent {
     // === STEP 3: Download ===
     this.stepChange.emit(3);
 
-    // Show download
+    // Show download button
     this.showDownload.set(true);
-    await this.sleep(500);
+    await this.sleep(400);
     this.downloadGlow.set(true);
+    await this.sleep(600);
+
+    // Move cursor to download button
+    this.cursorTop.set(90);
+    this.cursorLeft.set(50);
+    await this.sleep(800);
+
+    // Hover download button
+    this.downloadHovered.set(true);
+    await this.sleep(200);
+
+    // Click download button
+    this.cursorClicking.set(true);
+    await this.sleep(150);
+    this.cursorClicking.set(false);
+    await this.sleep(150);
 
     // Hold the success state
-    await this.sleep(2500);
+    await this.sleep(1500);
 
     if (!this.destroyed) {
       this.completed.emit();

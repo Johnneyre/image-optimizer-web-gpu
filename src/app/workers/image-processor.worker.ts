@@ -1,56 +1,12 @@
 /// <reference lib="webworker" />
 
-// ============================================================================
-// Tipos e Interfaces
-// ============================================================================
-
-interface ProcessImageMessage {
-  type: 'process';
-  imageBitmap: ImageBitmap;
-  operation: 'grayscale' | 'brightness' | 'contrast' | 'quality';
-  params: {
-    brightness?: number;
-    contrast?: number;
-    quality?: number;
-  };
-  requestId: number;
-}
-
-interface InitMessage {
-  type: 'init';
-}
-
-interface DestroyMessage {
-  type: 'destroy';
-}
-
-interface CancelMessage {
-  type: 'cancel';
-  requestId: number;
-}
-
-type WorkerMessage = ProcessImageMessage | InitMessage | DestroyMessage | CancelMessage;
-
-interface ProcessResult {
-  type: 'result';
-  imageData: Uint8Array;
-  width: number;
-  height: number;
-  processingTimeMs: number;
-  requestId: number;
-}
-
-interface ErrorResult {
-  type: 'error';
-  message: string;
-  requestId?: number;
-}
-
-interface InitResult {
-  type: 'init-complete';
-  supported: boolean;
-  adapterInfo?: string;
-}
+import type {
+  ProcessImageMessage,
+  WorkerMessage,
+  ProcessResult,
+  ErrorResult,
+  InitResult,
+} from '../types/worker.types';
 
 // ============================================================================
 // Shader WGSL

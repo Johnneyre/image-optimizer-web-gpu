@@ -1,7 +1,6 @@
 import { Component, input } from '@angular/core';
 import { LucideAngularModule, Loader2, Download } from 'lucide-angular';
-
-type Theme = 'dark' | 'light';
+import type { Theme } from '@types';
 
 @Component({
   selector: 'app-download-overlay',

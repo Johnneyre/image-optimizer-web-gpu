@@ -1,9 +1,5 @@
 import { Component } from '@angular/core';
-
-interface Stat {
-  label: string;
-  value: string;
-}
+import type { Stat } from '@types';
 
 @Component({
   selector: 'app-stats-section',

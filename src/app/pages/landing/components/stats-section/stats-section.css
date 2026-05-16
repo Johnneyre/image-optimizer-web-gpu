@@ -25,12 +25,38 @@
 }
 
 .stat-card {
+  --stat-index: 0;
   padding: 1rem;
   border-radius: 0.75rem;
   border: 1px solid oklch(from var(--border) l c h / 0.4);
   background: oklch(from var(--card) l c h / 0.5);
   text-align: center;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+  animation: statFadeInFromTop 0.2s ease-out both;
+  animation-delay: calc(0.2s + var(--stat-index) * 0.1s);
+}
+
+.stat-card:nth-child(1) {
+  --stat-index: 0;
+}
+.stat-card:nth-child(2) {
+  --stat-index: 1;
+}
+.stat-card:nth-child(3) {
+  --stat-index: 2;
+}
+
+@keyframes statFadeInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .stat-card:hover {

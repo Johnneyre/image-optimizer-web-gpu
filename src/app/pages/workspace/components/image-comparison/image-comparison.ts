@@ -18,8 +18,7 @@ import {
   X,
   Loader2,
 } from 'lucide-angular';
-
-type Theme = 'dark' | 'light';
+import type { Theme } from '@types';
 
 @Component({
   selector: 'app-image-comparison',

@@ -1,33 +1,6 @@
 import { Injectable, signal, computed, OnDestroy, effect } from '@angular/core';
 import { Subject, debounceTime, switchMap, from, catchError, of, filter } from 'rxjs';
-
-// ============================================================================
-// Tipos
-// ============================================================================
-
-export interface ProcessingParams {
-  brightness: number;
-  contrast: number;
-  quality: number;
-}
-
-export interface ProcessingResult {
-  imageData: Uint8Array;
-  width: number;
-  height: number;
-  processingTimeMs: number;
-}
-
-export interface ProcessingStats {
-  originalSize: number;
-  processedSize: number;
-  compressionRatio: number;
-  processingTimeMs: number;
-}
-
-// ============================================================================
-// Servicio
-// ============================================================================
+import type { ProcessingParams, ProcessingResult, ProcessingStats } from '@types';
 
 @Injectable({
   providedIn: 'root',

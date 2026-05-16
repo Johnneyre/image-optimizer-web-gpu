@@ -1,7 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { LucideAngularModule, Zap, Sun, Moon, Loader2, AlertCircle, Gpu } from 'lucide-angular';
-
-type Theme = 'dark' | 'light';
+import type { Theme } from '@types';
 
 @Component({
   selector: 'app-header',

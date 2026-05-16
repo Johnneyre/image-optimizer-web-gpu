@@ -19,7 +19,9 @@
       "@services/*": ["src/app/services/*"],
       "@components/*": ["src/app/components/*"],
       "@pages/*": ["src/app/pages/*"],
-      "@assets/*": ["src/assets/*"]
+      "@assets/*": ["src/assets/*"],
+      "@types": ["src/app/types/index.ts"],
+      "@types/*": ["src/app/types/*"]
     }
   },
   "angularCompilerOptions": {

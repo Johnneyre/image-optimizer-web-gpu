@@ -4,11 +4,9 @@ import { LucideAngularModule, AlertCircle } from 'lucide-angular';
 import { ImageProcessingService } from '@services/image-processing.service';
 import { ThemeService } from '@services/theme.service';
 import { ImageComparisonComponent } from './components/image-comparison/image-comparison';
-import {
-  SidebarControlsComponent,
-  DownloadRequest,
-} from './components/sidebar-controls/sidebar-controls';
+import { SidebarControlsComponent } from './components/sidebar-controls/sidebar-controls';
 import { DownloadOverlayComponent } from './components/download-overlay/download-overlay';
+import type { DownloadRequest } from '@types';
 
 @Component({
   selector: 'app-workspace',

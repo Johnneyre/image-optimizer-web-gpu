@@ -53,17 +53,22 @@
     [class.scene-active]="activeScene() === 'editor'"
     [class.scene-hidden]="activeScene() !== 'editor'"
   >
-    <!-- Original image (blurred background) -->
-    <img src="assets/demo-landscape.png" class="demo-img demo-img-original" alt="" aria-hidden="true" />
+    <!-- Optimized image (clear background) -->
+    <img
+      src="assets/demo-landscape.png"
+      class="demo-img demo-img-optimized"
+      alt=""
+      aria-hidden="true"
+    />
 
-    <!-- Optimized image with clip-path reveal -->
+    <!-- Original image with filter (revealed from left by clip-path) -->
     <div
-      class="demo-optimized-wrap"
+      class="demo-original-wrap"
+      [class.scan-complete]="scanComplete()"
       [style.clip-path]="'polygon(0 0, ' + scanPos() + '% 0, ' + scanPos() + '% 100%, 0 100%)'"
       [style.transition]="wrapperTransition()"
     >
       <img src="assets/demo-landscape.png" class="demo-img" alt="" aria-hidden="true" />
-      <div class="demo-optimized-tint"></div>
     </div>
 
     <!-- Scanline -->
@@ -93,7 +98,7 @@
     </div>
 
     <!-- Download button -->
-    <div class="demo-dl-wrap" [class.show]="showDownload()" [class.glow]="downloadGlow()">
+    <div class="demo-dl-wrap" [class.show]="showDownload()" [class.glow]="downloadGlow()" [class.hovered]="downloadHovered()">
       <button class="demo-dl-btn" type="button" tabindex="-1">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
           <path

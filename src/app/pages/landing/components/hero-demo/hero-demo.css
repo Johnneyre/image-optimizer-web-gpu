@@ -207,20 +207,18 @@
   object-fit: cover;
 }
 
-.demo-img-original {
-  filter: blur(1.5px) grayscale(35%) contrast(0.85) brightness(0.55);
-}
-
-.demo-optimized-wrap {
+.demo-original-wrap {
   position: absolute;
   inset: 0;
 }
 
-.demo-optimized-tint {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, oklch(from var(--primary) l c h / 0.08), transparent);
-  mix-blend-mode: overlay;
+.demo-original-wrap .demo-img {
+  filter: blur(0.5px) grayscale(30%) contrast(0.9) brightness(0.6);
+  transition: filter 0.6s ease-out;
+}
+
+.demo-original-wrap.scan-complete .demo-img {
+  filter: grayscale(10%) contrast(0.97) brightness(0.9);
 }
 
 /* --- Scanline --- */
@@ -348,13 +346,21 @@
   background: oklch(0.72 0.17 162);
   color: white;
   padding: 0.6rem 1.5rem;
-  border-radius: 9999px;
+  border-radius: 10px;
   border: none;
   font-weight: 600;
   font-size: 0.8rem;
   cursor: default;
   white-space: nowrap;
   box-shadow: 0 4px 16px oklch(0.72 0.17 162 / 0.35);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.demo-dl-wrap.hovered .demo-dl-btn {
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px oklch(0.72 0.17 162 / 0.5);
 }
 
 .demo-dl-wrap.glow {

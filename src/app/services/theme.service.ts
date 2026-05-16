@@ -1,7 +1,6 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-
-export type Theme = 'dark' | 'light';
+import type { Theme } from '@types';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {

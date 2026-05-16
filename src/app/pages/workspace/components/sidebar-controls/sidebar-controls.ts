@@ -13,21 +13,7 @@ import {
   Clock,
   SlidersHorizontal,
 } from 'lucide-angular';
-
-type Theme = 'dark' | 'light';
-
-export type DownloadFormat = 'image/webp' | 'image/jpeg' | 'image/png';
-
-interface QualityPreset {
-  label: string;
-  value: number;
-  description: string;
-}
-
-export interface DownloadRequest {
-  format: DownloadFormat;
-  quality: number;
-}
+import type { Theme, DownloadFormat, DownloadRequest, QualityPreset } from '@types';
 
 @Component({
   selector: 'app-sidebar-controls',
