@@ -2,14 +2,17 @@
 
 import type {
   ProcessImageMessage,
+  EncodeMessage,
   WorkerMessage,
   ProcessResult,
-  ErrorResult,
   InitResult,
+  OutputFormat,
+  BufferCache,
+  RgbaCache,
 } from '../types/worker.types';
 
 // ============================================================================
-// Shader WGSL
+// Shader WGSL - Brightness y Contrast
 // ============================================================================
 
 const IMAGE_PROCESSING_SHADER = /* wgsl */ `
@@ -18,8 +21,6 @@ struct Params {
   height: u32,
   brightness: f32,
   contrast: f32,
-  quality: f32,
-  _padding: f32,
 }
 
 @group(0) @binding(0) var<storage, read> inputPixels: array<u32>;
@@ -61,21 +62,17 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 
   var color = pixel.rgb;
 
-  // Brillo
+  // 1. Brillo (aditivo)
   color = color + vec3<f32>(params.brightness);
 
-  // Contraste
+  // 2. Contraste (centrado en 0.5)
   color = vec3<f32>(
     contrastCurve(color.r, params.contrast),
     contrastCurve(color.g, params.contrast),
     contrastCurve(color.b, params.contrast)
   );
 
-  // Simulación de compresión de calidad (posterización)
-  let qualityFactor = params.quality / 100.0;
-  let levels = mix(8.0, 256.0, qualityFactor);
-  color = floor(color * levels + 0.5) / levels;
-
+  // Clamp final y preservar alpha original
   let result = vec4<f32>(clamp(color, vec3<f32>(0.0), vec3<f32>(1.0)), pixel.a);
   outputPixels[index] = packRGBA(result);
 }
@@ -88,19 +85,18 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 let device: GPUDevice | null = null;
 let adapter: GPUAdapter | null = null;
 let pipeline: GPUComputePipeline | null = null;
+let isDeviceLost = false;
 
-let bufferCache: {
-  size: number;
-  inputBuffer: GPUBuffer;
-  outputBuffer: GPUBuffer;
-  stagingBuffer: GPUBuffer;
-} | null = null;
-
+let bufferCache: BufferCache | null = null;
 let paramsBuffer: GPUBuffer | null = null;
 let currentRequestId = 0;
+let processingLock: Promise<void> = Promise.resolve();
+
+// Cache del último resultado RGBA para re-encoding sin GPU
+let rgbaCache: RgbaCache | null = null;
 
 // ============================================================================
-// Inicialización
+// Inicialización WebGPU
 // ============================================================================
 
 async function initializeWebGPU(): Promise<InitResult> {
@@ -121,9 +117,16 @@ async function initializeWebGPU(): Promise<InitResult> {
       },
     });
 
+    isDeviceLost = false;
+
     device.lost.then((info) => {
-      console.error('WebGPU device lost:', info.message);
+      isDeviceLost = true;
       cleanup();
+
+      self.postMessage({
+        type: 'error',
+        message: `GPU device lost: ${info.message}. Please reload.`,
+      });
     });
 
     pipeline = device.createComputePipeline({
@@ -135,17 +138,20 @@ async function initializeWebGPU(): Promise<InitResult> {
     });
 
     paramsBuffer = device.createBuffer({
-      size: 32,
+      size: 16,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
     const adapterInfo = adapter.info;
+    const info = adapterInfo
+      ? `${adapterInfo.vendor} - ${adapterInfo.architecture}`
+      : 'WebGPU Ready';
     return {
       type: 'init-complete',
       supported: true,
-      adapterInfo: adapterInfo ? `${adapterInfo.vendor} - ${adapterInfo.architecture}` : 'WebGPU Ready',
+      adapterInfo: info,
     };
-  } catch (error) {
+  } catch {
     return { type: 'init-complete', supported: false };
   }
 }
@@ -154,8 +160,8 @@ async function initializeWebGPU(): Promise<InitResult> {
 // Gestión de Buffers
 // ============================================================================
 
-function ensureBuffers(pixelCount: number) {
-  if (!device) throw new Error('Device no inicializado');
+function ensureBuffers(pixelCount: number): BufferCache {
+  if (!device || !pipeline) throw new Error('Device no inicializado');
 
   const requiredSize = pixelCount * 4;
 
@@ -167,33 +173,98 @@ function ensureBuffers(pixelCount: number) {
     bufferCache.inputBuffer.destroy();
     bufferCache.outputBuffer.destroy();
     bufferCache.stagingBuffer.destroy();
+    bufferCache.bindGroup = null;
   }
+
+  const inputBuffer = device.createBuffer({
+    size: requiredSize,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+  });
+
+  const outputBuffer = device.createBuffer({
+    size: requiredSize,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+  });
+
+  const stagingBuffer = device.createBuffer({
+    size: requiredSize,
+    usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
+  });
+
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(0),
+    entries: [
+      { binding: 0, resource: { buffer: inputBuffer } },
+      { binding: 1, resource: { buffer: outputBuffer } },
+      { binding: 2, resource: { buffer: paramsBuffer! } },
+    ],
+  });
 
   bufferCache = {
     size: requiredSize,
-    inputBuffer: device.createBuffer({
-      size: requiredSize,
-      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    }),
-    outputBuffer: device.createBuffer({
-      size: requiredSize,
-      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-    }),
-    stagingBuffer: device.createBuffer({
-      size: requiredSize,
-      usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
-    }),
+    inputBuffer,
+    outputBuffer,
+    stagingBuffer,
+    bindGroup,
   };
 
   return bufferCache;
 }
 
 // ============================================================================
-// Procesamiento
+// Encoding con OffscreenCanvas (ejecuta en Worker, no bloquea main thread)
+// ============================================================================
+
+async function encodeImage(
+  rgbaData: Uint8Array,
+  width: number,
+  height: number,
+  format: OutputFormat,
+  quality: number,
+): Promise<{ buffer: ArrayBuffer; mimeType: string; timeMs: number }> {
+  const tStart = performance.now();
+
+  // Crear ImageData desde RGBA
+  const imageData = new ImageData(
+    new Uint8ClampedArray(rgbaData.buffer as ArrayBuffer, rgbaData.byteOffset, rgbaData.byteLength),
+    width,
+    height,
+  );
+
+  // Ajustar quality para evitar lossless bloat en 100%
+  let finalQuality = quality;
+  if (finalQuality >= 1) {
+    finalQuality = 0.98;
+  }
+
+  const canvas = new OffscreenCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('No se pudo crear contexto 2D en OffscreenCanvas');
+
+  ctx.putImageData(imageData, 0, 0);
+
+  const blob = await canvas.convertToBlob({
+    type: format,
+    quality: finalQuality,
+  });
+
+  const buffer = await blob.arrayBuffer();
+  const timeMs = performance.now() - tStart;
+
+  return { buffer, mimeType: blob.type, timeMs };
+}
+
+// ============================================================================
+// Procesamiento GPU + Encoding
 // ============================================================================
 
 async function processImage(message: ProcessImageMessage): Promise<ProcessResult | null> {
-  const { imageBitmap, params, requestId } = message;
+  const { imageBitmap, params, outputFormat, outputQuality, requestId } = message;
+
+  if (isDeviceLost) {
+    imageBitmap.close();
+    throw new Error('GPU device lost - please reload');
+  }
 
   if (requestId < currentRequestId) {
     imageBitmap.close();
@@ -201,8 +272,26 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
   }
 
   if (!device || !pipeline || !paramsBuffer) {
+    imageBitmap.close();
     throw new Error('WebGPU no inicializado');
   }
+
+  await processingLock;
+
+  if (requestId < currentRequestId) {
+    imageBitmap.close();
+    return null;
+  }
+
+  if (isDeviceLost) {
+    imageBitmap.close();
+    throw new Error('GPU device lost - please reload');
+  }
+
+  let releaseLock: () => void;
+  processingLock = new Promise((resolve) => {
+    releaseLock = resolve;
+  });
 
   const startTime = performance.now();
   const { width, height } = imageBitmap;
@@ -221,86 +310,157 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
     // Buffers
     const buffers = ensureBuffers(pixelCount);
 
+    if (isDeviceLost) {
+      throw new Error('GPU device lost during buffer setup');
+    }
+
     // Subir datos
     device.queue.writeBuffer(buffers.inputBuffer, 0, inputData);
 
-    // Parámetros - usar DataView para escribir u32 y f32 correctamente
-    const paramsData = new ArrayBuffer(24);
+    // Parámetros
+    const brightness = params.brightness ?? 0;
+    const contrast = params.contrast ?? 1;
+
+    const paramsData = new ArrayBuffer(16);
     const view = new DataView(paramsData);
-    view.setUint32(0, width, true);  // width como u32
-    view.setUint32(4, height, true); // height como u32
-    view.setFloat32(8, params.brightness ?? 0, true);
-    view.setFloat32(12, params.contrast ?? 1, true);
-    view.setFloat32(16, params.quality ?? 100, true);
-    view.setFloat32(20, 0, true);  // padding
+    view.setUint32(0, width, true);
+    view.setUint32(4, height, true);
+    view.setFloat32(8, brightness, true);
+    view.setFloat32(12, contrast, true);
     device.queue.writeBuffer(paramsBuffer, 0, paramsData);
 
-    // Bind group
-    const bindGroup = device.createBindGroup({
-      layout: pipeline.getBindGroupLayout(0),
-      entries: [
-        { binding: 0, resource: { buffer: buffers.inputBuffer } },
-        { binding: 1, resource: { buffer: buffers.outputBuffer } },
-        { binding: 2, resource: { buffer: paramsBuffer } },
-      ],
-    });
-
     // Ejecutar shader
+    const workgroupsX = Math.ceil(width / 16);
+    const workgroupsY = Math.ceil(height / 16);
+
     const commandEncoder = device.createCommandEncoder();
     const computePass = commandEncoder.beginComputePass();
     computePass.setPipeline(pipeline);
-    computePass.setBindGroup(0, bindGroup);
-    computePass.dispatchWorkgroups(Math.ceil(width / 16), Math.ceil(height / 16));
+    computePass.setBindGroup(0, buffers.bindGroup!);
+    computePass.dispatchWorkgroups(workgroupsX, workgroupsY);
     computePass.end();
 
-    commandEncoder.copyBufferToBuffer(buffers.outputBuffer, 0, buffers.stagingBuffer, 0, pixelCount * 4);
+    commandEncoder.copyBufferToBuffer(
+      buffers.outputBuffer,
+      0,
+      buffers.stagingBuffer,
+      0,
+      pixelCount * 4,
+    );
+
     device.queue.submit([commandEncoder.finish()]);
 
-    // Verificar cancelación
     if (requestId < currentRequestId) {
       imageBitmap.close();
+      releaseLock!();
       return null;
     }
 
+    if (isDeviceLost) {
+      throw new Error('GPU device lost before readback');
+    }
+
     // Leer resultado
-    await buffers.stagingBuffer.mapAsync(GPUMapMode.READ);
+    try {
+      await buffers.stagingBuffer.mapAsync(GPUMapMode.READ);
+    } catch (mapError) {
+      if (isDeviceLost) {
+        throw new Error('GPU device lost during mapAsync');
+      }
+      throw mapError;
+    }
+
     const resultData = new Uint8Array(buffers.stagingBuffer.getMappedRange().slice(0));
     buffers.stagingBuffer.unmap();
 
-    const processingTimeMs = performance.now() - startTime;
+    const gpuTimeMs = performance.now() - startTime;
+
+    // Cachear resultado RGBA para re-encoding
+    rgbaCache = { data: resultData, width, height };
+
+    // Encoding con OffscreenCanvas
+    const {
+      buffer: encodedBuffer,
+      mimeType,
+      timeMs: encodingTimeMs,
+    } = await encodeImage(resultData, width, height, outputFormat, outputQuality);
+
     imageBitmap.close();
+    releaseLock!();
 
     return {
       type: 'result',
-      imageData: resultData,
+      blobData: encodedBuffer,
+      blobType: mimeType,
+      blobSize: encodedBuffer.byteLength,
       width,
       height,
-      processingTimeMs,
+      processingTimeMs: gpuTimeMs,
+      encodingTimeMs,
       requestId,
     };
   } catch (error) {
     imageBitmap.close();
+    releaseLock!();
     throw error;
   }
 }
 
 // ============================================================================
-// Limpieza
+// Re-encoding (sin GPU, usa cache RGBA)
 // ============================================================================
 
-function cleanup(): void {
-  if (bufferCache) {
-    bufferCache.inputBuffer.destroy();
-    bufferCache.outputBuffer.destroy();
-    bufferCache.stagingBuffer.destroy();
-    bufferCache = null;
+async function reEncode(message: EncodeMessage): Promise<ProcessResult | null> {
+  const { outputFormat, outputQuality, requestId } = message;
+
+  if (!rgbaCache) {
+    throw new Error('No hay datos cacheados para re-encoding');
   }
-  paramsBuffer?.destroy();
+
+  if (requestId < currentRequestId) {
+    return null;
+  }
+
+  const { data, width, height } = rgbaCache;
+
+  // Encoding con OffscreenCanvas
+  const {
+    buffer: encodedBuffer,
+    mimeType,
+    timeMs: encodingTimeMs,
+  } = await encodeImage(data, width, height, outputFormat, outputQuality);
+
+  return {
+    type: 'result',
+    blobData: encodedBuffer,
+    blobType: mimeType,
+    blobSize: encodedBuffer.byteLength,
+    width,
+    height,
+    processingTimeMs: 0, // No GPU processing
+    encodingTimeMs,
+    requestId,
+  };
+}
+
+function cleanup(): void {
+  try {
+    bufferCache?.inputBuffer.destroy();
+    bufferCache?.outputBuffer.destroy();
+    bufferCache?.stagingBuffer.destroy();
+    paramsBuffer?.destroy();
+    device?.destroy();
+  } catch {
+    // Ignorar errores durante cleanup de recursos GPU
+  }
+
+  bufferCache = null;
   paramsBuffer = null;
   pipeline = null;
-  device?.destroy();
   device = null;
   adapter = null;
+  isDeviceLost = false;
+  rgbaCache = null;
 }
 
 // ============================================================================
@@ -313,8 +473,8 @@ globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
   try {
     switch (message.type) {
       case 'init': {
-        const result = await initializeWebGPU();
-        self.postMessage(result);
+        const gpuResult = await initializeWebGPU();
+        self.postMessage(gpuResult);
         break;
       }
 
@@ -322,8 +482,16 @@ globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         currentRequestId = message.requestId;
         const result = await processImage(message);
         if (result) {
-          // Transferir el ArrayBuffer
-          self.postMessage(result, [result.imageData.buffer]);
+          self.postMessage(result, [result.blobData]);
+        }
+        break;
+      }
+
+      case 'encode': {
+        currentRequestId = message.requestId;
+        const result = await reEncode(message);
+        if (result) {
+          self.postMessage(result, [result.blobData]);
         }
         break;
       }
@@ -345,7 +513,7 @@ globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
     self.postMessage({
       type: 'error',
       message: error instanceof Error ? error.message : 'Error desconocido',
-      requestId: (message as ProcessImageMessage).requestId,
-    } as ErrorResult);
+      requestId: 'requestId' in message ? message.requestId : undefined,
+    });
   }
 };

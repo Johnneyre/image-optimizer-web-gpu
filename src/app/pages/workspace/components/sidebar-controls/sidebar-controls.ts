@@ -45,6 +45,7 @@ export class SidebarControlsComponent {
   readonly presetSelect = output<number>();
   readonly resetAdjustments = output<void>();
   readonly downloadRequested = output<DownloadRequest>();
+  readonly formatChange = output<DownloadFormat>();
 
   // Icons
   readonly icons = {
@@ -73,7 +74,6 @@ export class SidebarControlsComponent {
   readonly formatOptions: { value: DownloadFormat; label: string }[] = [
     { value: 'image/webp', label: 'WebP' },
     { value: 'image/jpeg', label: 'JPEG' },
-    { value: 'image/png', label: 'PNG' },
   ];
 
   readonly formatExtension = computed(() => {
@@ -83,8 +83,6 @@ export class SidebarControlsComponent {
         return '.webp';
       case 'image/jpeg':
         return '.jpg';
-      case 'image/png':
-        return '.png';
       default:
         return '.webp';
     }
@@ -122,9 +120,9 @@ export class SidebarControlsComponent {
     this.resetAdjustments.emit();
   }
 
-  onFormatChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value as DownloadFormat;
-    this.selectedFormat.set(value);
+  onFormatChange(format: DownloadFormat): void {
+    this.selectedFormat.set(format);
+    this.formatChange.emit(format);
   }
 
   onDownload(): void {

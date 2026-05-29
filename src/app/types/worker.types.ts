@@ -1,3 +1,29 @@
+export type OutputFormat = 'image/webp' | 'image/jpeg';
+
+export interface BufferCache {
+  size: number;
+  inputBuffer: GPUBuffer;
+  outputBuffer: GPUBuffer;
+  stagingBuffer: GPUBuffer;
+  bindGroup: GPUBindGroup | null;
+}
+
+export interface RgbaCache {
+  data: Uint8Array;
+  width: number;
+  height: number;
+}
+
+export interface WorkerProcessResult {
+  blobData: ArrayBuffer;
+  blobType: string;
+  blobSize: number;
+  width: number;
+  height: number;
+  processingTimeMs: number;
+  encodingTimeMs: number;
+}
+
 export interface ProcessImageMessage {
   type: 'process';
   imageBitmap: ImageBitmap;
@@ -7,6 +33,17 @@ export interface ProcessImageMessage {
     contrast?: number;
     quality?: number;
   };
+  // Output encoding params
+  outputFormat: OutputFormat;
+  outputQuality: number; // 0-1
+  requestId: number;
+}
+
+// Re-encode cached result with different format/quality (no GPU processing)
+export interface EncodeMessage {
+  type: 'encode';
+  outputFormat: OutputFormat;
+  outputQuality: number;
   requestId: number;
 }
 
@@ -23,14 +60,18 @@ export interface CancelMessage {
   requestId: number;
 }
 
-export type WorkerMessage = ProcessImageMessage | InitMessage | DestroyMessage | CancelMessage;
+export type WorkerMessage = ProcessImageMessage | EncodeMessage | InitMessage | DestroyMessage | CancelMessage;
 
+// Result now returns encoded blob data instead of raw RGBA
 export interface ProcessResult {
   type: 'result';
-  imageData: Uint8Array;
+  blobData: ArrayBuffer; // Encoded image (WebP/JPEG)
+  blobType: string; // MIME type
+  blobSize: number;
   width: number;
   height: number;
   processingTimeMs: number;
+  encodingTimeMs: number;
   requestId: number;
 }
 

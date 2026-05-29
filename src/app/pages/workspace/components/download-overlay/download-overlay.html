@@ -1,5 +1,5 @@
 @if (isVisible()) {
-  <div class="overlay-backdrop" [class]="theme() === 'dark' ? 'bg-slate-950/85' : 'bg-white/85'">
+  <div [class]="(theme() === 'dark' ? 'bg-slate-950/85' : 'bg-white/85') + ' overlay-backdrop'">
     <div class="overlay-content">
       <!-- Animated rings -->
       <div class="loader-rings">

@@ -1,6 +1,7 @@
-import { Injectable, signal, computed, OnDestroy, effect } from '@angular/core';
+import { Injectable, signal, computed, OnDestroy, effect, untracked } from '@angular/core';
 import { Subject, debounceTime, switchMap, from, catchError, of, filter } from 'rxjs';
-import type { ProcessingParams, ProcessingResult, ProcessingStats } from '@types';
+import type { ProcessingParams, ProcessingStats, DownloadFormat } from '@types';
+import type { ProcessResult, WorkerProcessResult } from '../types/worker.types';
 
 @Injectable({
   providedIn: 'root',
@@ -8,10 +9,10 @@ import type { ProcessingParams, ProcessingResult, ProcessingStats } from '@types
 export class ImageProcessingService implements OnDestroy {
   private worker: Worker | null = null;
   private requestIdCounter = 0;
-  private pendingRequests = new Map<
+  private readonly pendingRequests = new Map<
     number,
     {
-      resolve: (value: ProcessingResult) => void;
+      resolve: (value: WorkerProcessResult) => void;
       reject: (reason: Error) => void;
     }
   >();
@@ -19,6 +20,7 @@ export class ImageProcessingService implements OnDestroy {
   private readonly processRequest$ = new Subject<{
     file: File | Blob;
     params: ProcessingParams;
+    needsGpu: boolean;
   }>();
 
   // Signals públicos
@@ -32,6 +34,15 @@ export class ImageProcessingService implements OnDestroy {
   readonly originalImageUrl = signal<string | null>(null);
   readonly processedImageUrl = signal<string | null>(null);
   readonly processingTimeMs = signal<number>(0);
+  readonly processedBlobSize = signal<number>(0);
+
+  // Formato de salida seleccionado
+  readonly outputFormat = signal<DownloadFormat>('image/webp');
+
+  // Parámetros de imagen usados en el último procesamiento GPU
+  private lastGpuParams: { brightness: number; contrast: number } | null = null;
+  // Track if worker has cached RGBA data
+  private workerHasCache = false;
 
   // Parámetros reactivos
   readonly quality = signal(80);
@@ -41,6 +52,12 @@ export class ImageProcessingService implements OnDestroy {
   // Computed
   readonly isReady = computed(() => this.isSupported() === true && !this.isInitializing());
   readonly hasImage = computed(() => this.currentFile() !== null);
+
+  readonly hasImageAdjustments = computed(() => {
+    const b = this.brightness();
+    const c = this.contrast();
+    return b !== 0 || c !== 1;
+  });
 
   readonly params = computed<ProcessingParams>(() => ({
     quality: this.quality(),
@@ -52,16 +69,16 @@ export class ImageProcessingService implements OnDestroy {
     const file = this.currentFile();
     const url = this.processedImageUrl();
     const time = this.processingTimeMs();
+    const processedSize = this.processedBlobSize();
 
-    if (!file || !url) return null;
+    if (!file || !url || processedSize === 0) return null;
 
-    const qualityFactor = this.quality() / 100;
-    const estimatedSize = Math.round(file.size * qualityFactor * 0.7);
+    const diff = file.size - processedSize;
 
     return {
       originalSize: file.size,
-      processedSize: estimatedSize,
-      compressionRatio: ((file.size - estimatedSize) / file.size) * 100,
+      processedSize: processedSize,
+      compressionRatio: (diff / file.size) * 100,
       processingTimeMs: time,
     };
   });
@@ -76,35 +93,66 @@ export class ImageProcessingService implements OnDestroy {
       const file = this.currentFile();
       const params = this.params();
       const isReady = this.isReady();
+      const hasAdjustments = this.hasImageAdjustments();
 
       if (file && isReady) {
-        this.processRequest$.next({ file, params });
+        untracked(() => {
+          // CASO ESPECIAL: quality=100% sin ajustes → usar archivo original
+          if (params.quality === 100 && !hasAdjustments) {
+            this.useOriginalFile(file);
+            return;
+          }
+
+          // Detectar si necesitamos GPU o solo re-encoding
+          const gpuParamsChanged =
+            this.lastGpuParams?.brightness !== params.brightness ||
+            this.lastGpuParams.contrast !== params.contrast;
+
+          const needsGpu = gpuParamsChanged || !this.workerHasCache;
+
+          this.processRequest$.next({ file, params, needsGpu });
+        });
       }
     });
 
     this.processRequest$
       .pipe(
-        debounceTime(100),
+        debounceTime(300),
         filter(() => this.isReady()),
-        switchMap(({ file, params }) =>
-          from(this.processImageInternal(file, params)).pipe(
+        switchMap(({ file, params, needsGpu }) => {
+          return from(this.processInternal(file, params, needsGpu)).pipe(
             catchError((error) => {
               if (error.message !== 'Request cancelada') {
                 this.lastError.set(error.message);
               }
               return of(null);
             }),
-          ),
-        ),
+          );
+        }),
       )
-      .subscribe(async (result) => {
+      .subscribe((result) => {
         if (result) {
-          await this.updateProcessedImage(result);
+          this.updateFromWorkerResult(result);
         }
       });
   }
 
-  private async initializeWorker(): Promise<void> {
+  private useOriginalFile(file: File): void {
+    const oldUrl = this.processedImageUrl();
+    if (oldUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(oldUrl);
+    }
+
+    this.lastGpuParams = null;
+    this.workerHasCache = false;
+
+    const url = URL.createObjectURL(file);
+    this.processedImageUrl.set(url);
+    this.processedBlobSize.set(file.size);
+    this.processingTimeMs.set(0);
+  }
+
+  private initializeWorker(): void {
     if (typeof Worker === 'undefined') {
       this.isSupported.set(false);
       this.isInitializing.set(false);
@@ -139,7 +187,7 @@ export class ImageProcessingService implements OnDestroy {
         break;
 
       case 'result':
-        this.handleProcessingResult(data);
+        this.handleProcessingResult(data as ProcessResult);
         break;
 
       case 'error':
@@ -155,22 +203,19 @@ export class ImageProcessingService implements OnDestroy {
     this.pendingRequests.clear();
   }
 
-  private handleProcessingResult(data: {
-    imageData: Uint8Array;
-    width: number;
-    height: number;
-    processingTimeMs: number;
-    requestId: number;
-  }): void {
+  private handleProcessingResult(data: ProcessResult): void {
     const request = this.pendingRequests.get(data.requestId);
     if (request) {
       this.pendingRequests.delete(data.requestId);
       this.isProcessing.set(this.pendingRequests.size > 0);
       request.resolve({
-        imageData: data.imageData,
+        blobData: data.blobData,
+        blobType: data.blobType,
+        blobSize: data.blobSize,
         width: data.width,
         height: data.height,
         processingTimeMs: data.processingTimeMs,
+        encodingTimeMs: data.encodingTimeMs,
       });
     }
   }
@@ -186,51 +231,80 @@ export class ImageProcessingService implements OnDestroy {
     this.isProcessing.set(this.pendingRequests.size > 0);
   }
 
-  private async updateProcessedImage(result: ProcessingResult): Promise<void> {
-    console.log('[Service] updateProcessedImage', {
-      width: result.width,
-      height: result.height,
-      dataLength: result.imageData.length,
-    });
-
-    // Liberar URL anterior
+  private updateFromWorkerResult(result: WorkerProcessResult): void {
     const oldUrl = this.processedImageUrl();
     if (oldUrl?.startsWith('blob:')) {
       URL.revokeObjectURL(oldUrl);
     }
 
-    // Crear ImageData y renderizar en canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = result.width;
-    canvas.height = result.height;
+    // Crear blob desde ArrayBuffer recibido del worker
+    const blob = new Blob([result.blobData], { type: result.blobType });
+    const url = URL.createObjectURL(blob);
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.error('[Service] No se pudo crear contexto 2D');
-      return;
+    this.processedImageUrl.set(url);
+    this.processedBlobSize.set(result.blobSize);
+    this.processingTimeMs.set(result.processingTimeMs + result.encodingTimeMs);
+  }
+
+  private async processInternal(
+    file: File | Blob,
+    params: ProcessingParams,
+    needsGpu: boolean,
+  ): Promise<WorkerProcessResult> {
+    if (!this.worker || !this.isReady()) {
+      throw new Error('Servicio no inicializado');
     }
 
-    const imageData = new ImageData(
-      new Uint8ClampedArray(result.imageData),
-      result.width,
-      result.height,
-    );
-    ctx.putImageData(imageData, 0, 0);
+    const requestId = ++this.requestIdCounter;
+    this.isProcessing.set(true);
+    this.lastError.set(null);
 
-    console.log('[Service] ImageData aplicada al canvas');
+    const format = this.outputFormat();
+    const outputQuality = params.quality / 100;
 
-    // Generar URL usando promesa
-    const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob(resolve, 'image/png');
-    });
+    if (needsGpu) {
+      // Full GPU processing + encoding
+      const imageBitmap = await createImageBitmap(file);
 
-    if (blob) {
-      const url = URL.createObjectURL(blob);
-      console.log('[Service] URL creada:', url, 'blob size:', blob.size);
-      this.processedImageUrl.set(url);
-      this.processingTimeMs.set(result.processingTimeMs);
+      return new Promise<WorkerProcessResult>((resolve, reject) => {
+        this.pendingRequests.set(requestId, {
+          resolve: (result) => {
+            // Update tracking
+            this.lastGpuParams = {
+              brightness: params.brightness,
+              contrast: params.contrast,
+            };
+            this.workerHasCache = true;
+            resolve(result);
+          },
+          reject,
+        });
+
+        this.worker!.postMessage(
+          {
+            type: 'process',
+            imageBitmap,
+            operation: 'quality',
+            params,
+            outputFormat: format,
+            outputQuality,
+            requestId,
+          },
+          [imageBitmap],
+        );
+      });
     } else {
-      console.error('[Service] toBlob devolvió null');
+      // Re-encode only (no GPU) - worker uses cached RGBA
+      return new Promise<WorkerProcessResult>((resolve, reject) => {
+        this.pendingRequests.set(requestId, { resolve, reject });
+
+        this.worker!.postMessage({
+          type: 'encode',
+          outputFormat: format,
+          outputQuality,
+          requestId,
+        });
+      });
     }
   }
 
@@ -266,6 +340,10 @@ export class ImageProcessingService implements OnDestroy {
     this.contrast.set(1);
   }
 
+  setOutputFormat(format: DownloadFormat): void {
+    this.outputFormat.set(format);
+  }
+
   clearFile(): void {
     const url = this.originalImageUrl();
     if (url) URL.revokeObjectURL(url);
@@ -281,72 +359,55 @@ export class ImageProcessingService implements OnDestroy {
     this.originalImageUrl.set(null);
     this.processedImageUrl.set(null);
     this.processingTimeMs.set(0);
+    this.processedBlobSize.set(0);
     this.lastError.set(null);
+    this.lastGpuParams = null;
+    this.workerHasCache = false;
+
+    // Resetear ajustes a valores por defecto
+    this.quality.set(80);
+    this.brightness.set(0);
+    this.contrast.set(1);
   }
 
   async generateDownloadBlob(
-    format: 'image/webp' | 'image/png' | 'image/jpeg' = 'image/webp',
+    format: DownloadFormat = 'image/webp',
     quality: number = 0.85,
   ): Promise<Blob> {
-    const url = this.processedImageUrl();
-    if (!url) throw new Error('No hay imagen procesada');
-
-    const response = await fetch(url);
-    const blob = await response.blob();
-
-    // Si ya es el formato correcto, retornar
-    if (format === 'image/png') return blob;
-
-    // Convertir a otro formato
-    const img = new Image();
-    img.src = url;
-    await new Promise((resolve) => (img.onload = resolve));
-
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('No se pudo crear contexto');
-
-    ctx.drawImage(img, 0, 0);
-
-    return new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (b) => (b ? resolve(b) : reject(new Error('Error generando blob'))),
-        format,
-        quality,
-      );
-    });
-  }
-
-  private async processImageInternal(
-    file: File | Blob,
-    params: ProcessingParams,
-  ): Promise<ProcessingResult> {
-    if (!this.worker || !this.isReady()) {
-      throw new Error('Servicio no inicializado');
+    // Si estamos usando el archivo original (quality=100% sin ajustes)
+    const file = this.currentFile();
+    if (!this.workerHasCache && file) {
+      return file;
     }
 
-    const requestId = ++this.requestIdCounter;
-    this.isProcessing.set(true);
-    this.lastError.set(null);
+    // Si hay cache en el worker, pedir re-encode con los parámetros de descarga
+    if (this.workerHasCache && this.worker) {
+      const requestId = ++this.requestIdCounter;
 
-    const imageBitmap = await createImageBitmap(file);
+      return new Promise<Blob>((resolve, reject) => {
+        const handler = (event: MessageEvent) => {
+          const data = event.data;
+          if (data.type === 'result' && data.requestId === requestId) {
+            this.worker!.removeEventListener('message', handler);
+            const blob = new Blob([data.blobData], { type: data.blobType });
+            resolve(blob);
+          } else if (data.type === 'error' && data.requestId === requestId) {
+            this.worker!.removeEventListener('message', handler);
+            reject(new Error(data.message));
+          }
+        };
 
-    return new Promise<ProcessingResult>((resolve, reject) => {
-      this.pendingRequests.set(requestId, { resolve, reject });
-
-      this.worker!.postMessage(
-        {
-          type: 'process',
-          imageBitmap,
-          operation: 'quality',
-          params,
+        this.worker!.addEventListener('message', handler);
+        this.worker!.postMessage({
+          type: 'encode',
+          outputFormat: format,
+          outputQuality: quality,
           requestId,
-        },
-        [imageBitmap],
-      );
-    });
+        });
+      });
+    }
+
+    throw new Error('No hay imagen procesada');
   }
 
   private cancelAllRequests(): void {

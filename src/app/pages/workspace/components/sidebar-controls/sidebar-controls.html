@@ -1,23 +1,25 @@
 <aside
-  class="w-full lg:w-80 xl:w-96 flex flex-col border-t lg:border-t-0 lg:border-l transition-colors"
-  [class]="theme() === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'"
+  [class]="
+    (theme() === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200') +
+    ' w-full lg:w-80 xl:w-96 flex flex-col border-t lg:border-t-0 lg:border-l transition-colors'
+  "
 >
   <!-- File Info -->
-  <div class="p-4 border-b" [class]="theme() === 'dark' ? 'border-slate-800' : 'border-slate-200'">
+  <div [class]="(theme() === 'dark' ? 'border-slate-800' : 'border-slate-200') + ' p-4 border-b'">
     <div class="flex items-start gap-3">
       <div
-        class="p-2 rounded-lg shrink-0"
-        [class]="theme() === 'dark' ? 'bg-slate-800' : 'bg-slate-100'"
+        [class]="
+          (theme() === 'dark' ? 'bg-slate-800' : 'bg-slate-100') + ' p-2 rounded-lg shrink-0'
+        "
       >
         <lucide-icon
           [img]="icons.Image"
-          class="w-5 h-5"
-          [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'"
+          [class]="(theme() === 'dark' ? 'text-slate-400' : 'text-slate-500') + ' w-5 h-5'"
         />
       </div>
       <div class="min-w-0 flex-1">
         <p class="text-sm font-medium truncate" [title]="fileName()">{{ fileName() }}</p>
-        <p class="text-xs" [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'">
+        <p [class]="(theme() === 'dark' ? 'text-slate-500' : 'text-slate-400') + ' text-xs'">
           {{ originalSize() }}
         </p>
       </div>
@@ -26,29 +28,29 @@
 
   <!-- Stats Badge -->
   @if (hasStats()) {
-    <div
-      class="p-4 border-b"
-      [class]="theme() === 'dark' ? 'border-slate-800' : 'border-slate-200'"
-    >
+    <div [class]="(theme() === 'dark' ? 'border-slate-800' : 'border-slate-200') + ' p-4 border-b'">
       <div
-        class="flex items-center justify-between p-3 rounded-lg border"
         [class]="
-          sizeDifference()?.isReduction
+          (sizeDifference()?.isReduction
             ? 'bg-emerald-500/10 border-emerald-500/20'
-            : 'bg-amber-500/10 border-amber-500/20'
+            : 'bg-amber-500/10 border-amber-500/20') +
+          ' flex items-center justify-between p-3 rounded-lg border'
         "
       >
         <div class="flex items-center gap-2">
           <lucide-icon
             [img]="icons.FileDown"
-            class="w-4 h-4"
-            [class]="sizeDifference()?.isReduction ? 'text-emerald-500' : 'text-amber-500'"
+            [class]="
+              (sizeDifference()?.isReduction ? 'text-emerald-500' : 'text-amber-500') + ' w-4 h-4'
+            "
           />
           <span class="text-sm">{{ originalSize() }} → {{ processedSize() }}</span>
         </div>
         <span
-          class="text-sm font-semibold"
-          [class]="sizeDifference()?.isReduction ? 'text-emerald-500' : 'text-amber-500'"
+          [class]="
+            (sizeDifference()?.isReduction ? 'text-emerald-500' : 'text-amber-500') +
+            ' text-sm font-semibold'
+          "
         >
           {{ sizeDifference()?.percent }}
         </span>
@@ -56,8 +58,10 @@
 
       @if (processingTime()) {
         <div
-          class="flex items-center gap-2 mt-2 text-xs"
-          [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'"
+          [class]="
+            (theme() === 'dark' ? 'text-slate-500' : 'text-slate-400') +
+            ' flex items-center gap-2 mt-2 text-xs'
+          "
         >
           <lucide-icon [img]="icons.Clock" class="w-3.5 h-3.5" />
           <span>Procesado en {{ processingTime() }}</span>
@@ -75,20 +79,22 @@
         <div class="grid grid-cols-4 gap-2">
           @for (preset of qualityPresets; track preset.value) {
             <button
-              class="p-2 rounded-lg border text-center transition-all"
               [class]="
-                selectedPreset() === preset.value
+                (selectedPreset() === preset.value
                   ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500'
                   : theme() === 'dark'
                     ? 'bg-slate-800 border-slate-700 hover:border-slate-600'
-                    : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                    : 'bg-slate-50 border-slate-200 hover:border-slate-300') +
+                ' p-2 rounded-lg border text-center transition-all'
               "
               (click)="onSelectPreset(preset.value)"
             >
               <span class="text-sm font-medium">{{ preset.label }}</span>
               <span
-                class="block text-xs mt-0.5"
-                [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'"
+                [class]="
+                  (theme() === 'dark' ? 'text-slate-500' : 'text-slate-400') +
+                  ' block text-xs mt-0.5'
+                "
               >
                 {{ preset.description }}
               </span>
@@ -109,12 +115,16 @@
           max="100"
           [value]="quality()"
           (input)="onQualityChange($event)"
-          class="w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb"
-          [class]="theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200'"
+          [class]="
+            (theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200') +
+            ' w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb'
+          "
         />
         <div
-          class="flex justify-between text-xs mt-1"
-          [class]="theme() === 'dark' ? 'text-slate-500' : 'text-slate-400'"
+          [class]="
+            (theme() === 'dark' ? 'text-slate-500' : 'text-slate-400') +
+            ' flex justify-between text-xs mt-1'
+          "
         >
           <span>Menor</span>
           <span>Mayor</span>
@@ -129,8 +139,9 @@
             Brillo
           </label>
           <span
-            class="text-sm font-mono"
-            [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'"
+            [class]="
+              (theme() === 'dark' ? 'text-slate-400' : 'text-slate-500') + ' text-sm font-mono'
+            "
           >
             {{ brightness() > 0 ? '+' : '' }}{{ (brightness() * 100).toFixed(0) }}%
           </span>
@@ -142,8 +153,10 @@
           step="0.01"
           [value]="brightness()"
           (input)="onBrightnessChange($event)"
-          class="w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb"
-          [class]="theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200'"
+          [class]="
+            (theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200') +
+            ' w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb'
+          "
         />
       </div>
 
@@ -155,8 +168,9 @@
             Contraste
           </label>
           <span
-            class="text-sm font-mono"
-            [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'"
+            [class]="
+              (theme() === 'dark' ? 'text-slate-400' : 'text-slate-500') + ' text-sm font-mono'
+            "
           >
             {{ (contrast() * 100).toFixed(0) }}%
           </span>
@@ -168,18 +182,20 @@
           step="0.01"
           [value]="contrast()"
           (input)="onContrastChange($event)"
-          class="w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb"
-          [class]="theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200'"
+          [class]="
+            (theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200') +
+            ' w-full h-2 rounded-lg appearance-none cursor-pointer slider-thumb'
+          "
         />
       </div>
 
       <!-- Reset -->
       <button
-        class="w-full py-2 px-4 flex items-center justify-center gap-2 rounded-lg border transition-colors"
         [class]="
-          theme() === 'dark'
+          (theme() === 'dark'
             ? 'bg-slate-800 hover:bg-slate-700 border-slate-700'
-            : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+            : 'bg-slate-50 hover:bg-slate-100 border-slate-200') +
+          ' w-full py-2 px-4 flex items-center justify-center gap-2 rounded-lg border transition-colors'
         "
         (click)="onResetAdjustments()"
       >
@@ -193,15 +209,15 @@
         <div class="grid grid-cols-3 gap-2">
           @for (fmt of formatOptions; track fmt.value) {
             <button
-              class="p-2 rounded-lg border text-center transition-all text-sm font-medium"
               [class]="
-                selectedFormat() === fmt.value
+                (selectedFormat() === fmt.value
                   ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500'
                   : theme() === 'dark'
                     ? 'bg-slate-800 border-slate-700 hover:border-slate-600'
-                    : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                    : 'bg-slate-50 border-slate-200 hover:border-slate-300') +
+                ' p-2 rounded-lg border text-center transition-all text-sm font-medium'
               "
-              (click)="selectedFormat.set(fmt.value)"
+              (click)="onFormatChange(fmt.value)"
             >
               {{ fmt.label }}
             </button>
@@ -212,15 +228,15 @@
   </div>
 
   <!-- Download Button -->
-  <div class="p-4 border-t" [class]="theme() === 'dark' ? 'border-slate-800' : 'border-slate-200'">
+  <div [class]="(theme() === 'dark' ? 'border-slate-800' : 'border-slate-200') + ' p-4 border-t'">
     <button
-      class="w-full py-3 px-4 flex items-center justify-center gap-2 rounded-lg font-medium transition-all"
       [class]="
-        canDownload()
+        (canDownload()
           ? 'bg-linear-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white shadow-lg shadow-cyan-500/25'
           : theme() === 'dark'
             ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+            : 'bg-slate-100 text-slate-400 cursor-not-allowed') +
+        ' w-full py-3 px-4 flex items-center justify-center gap-2 rounded-lg font-medium transition-all'
       "
       [disabled]="!canDownload()"
       (click)="onDownload()"

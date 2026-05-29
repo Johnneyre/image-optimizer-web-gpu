@@ -1,4 +1,4 @@
-export type DownloadFormat = 'image/webp' | 'image/jpeg' | 'image/png';
+export type DownloadFormat = 'image/webp' | 'image/jpeg';
 
 export interface QualityPreset {
   label: string;

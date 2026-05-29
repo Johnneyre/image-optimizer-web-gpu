@@ -8,25 +8,23 @@
     border-color 0.3s ease;
 }
 
-/* Slider handle - wide hit area for easier grabbing */
+/* Slider handle - línea delgada pero área de click amplia */
 .slider-handle {
   cursor: ew-resize;
-  padding: 0 12px;
-  margin: 0 -12px;
 }
 
-/* Smooth transitions for the comparison slider */
-[style*='clip-path'] {
-  transition: clip-path 0.05s ease-out;
+/* Área de click invisible más amplia */
+.slider-handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -12px;
+  right: -12px;
 }
 
 /* Prevent image selection during drag */
 img {
   user-select: none;
   -webkit-user-drag: none;
-}
-
-/* Smooth zoom transitions */
-[style*='transform'] {
-  transition: transform 0.15s ease-out;
 }

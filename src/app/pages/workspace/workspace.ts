@@ -6,7 +6,7 @@ import { ThemeService } from '@services/theme.service';
 import { ImageComparisonComponent } from './components/image-comparison/image-comparison';
 import { SidebarControlsComponent } from './components/sidebar-controls/sidebar-controls';
 import { DownloadOverlayComponent } from './components/download-overlay/download-overlay';
-import type { DownloadRequest } from '@types';
+import type { DownloadRequest, DownloadFormat } from '@types';
 
 @Component({
   selector: 'app-workspace',
@@ -105,6 +105,10 @@ export class WorkspacePage {
 
   resetAdjustments(): void {
     this.imageService.resetAdjustments();
+  }
+
+  onFormatChange(format: DownloadFormat): void {
+    this.imageService.setOutputFormat(format);
   }
 
   clearImage(): void {

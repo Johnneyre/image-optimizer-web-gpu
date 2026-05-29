@@ -1,8 +1,8 @@
 <div
-  class="workspace-shell"
-  [class]="theme() === 'dark'
-    ? 'bg-slate-950 text-slate-100'
-    : 'bg-slate-50 text-slate-900'"
+  [class]="
+    (theme() === 'dark' ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900') +
+    ' workspace-shell'
+  "
 >
   <!-- Editor Layout -->
   <div class="flex-1 flex flex-col lg:flex-row">
@@ -34,13 +34,11 @@
       (contrastChange)="onContrastChange($event)"
       (presetSelect)="onPresetSelect($event)"
       (resetAdjustments)="resetAdjustments()"
+      (formatChange)="onFormatChange($event)"
       (downloadRequested)="onDownloadRequested($event)"
     />
   </div>
 </div>
 
 <!-- Download Overlay (Fullscreen loader) -->
-<app-download-overlay
-  [theme]="theme()"
-  [isVisible]="isDownloading()"
-/>
+<app-download-overlay [theme]="theme()" [isVisible]="isDownloading()" />
