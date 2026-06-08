@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, HostListener, input, output, signal } from '@angular/core';
 import { LucideAngularModule, Zap, Sun, Moon, Loader2, AlertCircle, Gpu } from 'lucide-angular';
 import type { Theme } from '@types';
 
@@ -7,6 +7,9 @@ import type { Theme } from '@types';
   imports: [LucideAngularModule],
   templateUrl: './header.html',
   styles: [`:host { display: block; position: sticky; top: 0; z-index: 50; }`],
+  host: {
+    '[class.scrolled]': 'scrolled()',
+  },
 })
 export class HeaderComponent {
   // Inputs
@@ -18,8 +21,16 @@ export class HeaderComponent {
   // Outputs
   readonly themeToggle = output<void>();
 
+  // State
+  readonly scrolled = signal(false);
+
   // Icons
   readonly icons = { Zap, Sun, Moon, Loader2, AlertCircle, Gpu };
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.scrolled.set(window.scrollY > 10);
+  }
 
   onToggleTheme(): void {
     this.themeToggle.emit();

@@ -1,5 +1,5 @@
 <header
-  class="border-b border-[oklch(from_var(--border)_l_c_h/0.6)] bg-[oklch(from_var(--background)_l_c_h/0.8)] backdrop-blur-md transition-colors duration-300 ease"
+  [class]="scrolled() ? 'transition-all duration-300 ease border-b border-[oklch(from_var(--border)_l_c_h/0.6)] bg-[oklch(from_var(--background)_l_c_h/0.8)] backdrop-blur-md' : 'transition-all duration-300 ease border-b border-transparent bg-transparent'"
 >
   <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
     <div class="flex items-center gap-3">
