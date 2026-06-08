@@ -1,16 +1,18 @@
 import { Component, input } from '@angular/core';
-import { LucideAngularModule, Loader2, Download } from 'lucide-angular';
+import { LucideAngularModule, Download } from 'lucide-angular';
 import type { Theme } from '@types';
 
 @Component({
   selector: 'app-download-overlay',
   imports: [LucideAngularModule],
   templateUrl: './download-overlay.html',
-  styleUrl: './download-overlay.css',
+  host: {
+    class: 'contents',
+  },
 })
 export class DownloadOverlayComponent {
   readonly theme = input.required<Theme>();
   readonly isVisible = input(false);
 
-  readonly icons = { Loader2, Download };
+  readonly icons = { Download };
 }

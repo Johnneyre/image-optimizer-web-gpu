@@ -9,7 +9,9 @@ import { HeaderComponent } from './components/header/header';
   selector: 'app-root',
   imports: [RouterOutlet, LucideAngularModule, HeaderComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css',
+  host: {
+    class: 'block min-h-dvh',
+  },
 })
 export class App {
   private readonly imageService = inject(ImageProcessingService);

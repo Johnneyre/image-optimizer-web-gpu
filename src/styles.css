@@ -121,11 +121,24 @@ body {
   color: var(--foreground);
 }
 
-/* Prevent text selection on UI elements */
-button,
-label,
-[role='button'] {
-  user-select: none;
+/* Base focus and interaction styles */
+@layer base {
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  button:focus,
+  input:focus {
+    outline: none;
+  }
+
+  button,
+  label,
+  [role='button'] {
+    user-select: none;
+  }
 }
 
 /* Smooth scrolling */
@@ -194,5 +207,26 @@ label,
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

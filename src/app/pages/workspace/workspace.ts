@@ -17,7 +17,9 @@ import type { DownloadRequest, DownloadFormat } from '@types';
     DownloadOverlayComponent,
   ],
   templateUrl: './workspace.html',
-  styleUrl: './workspace.css',
+  host: {
+    class: 'block h-[calc(100dvh-70px)] overflow-hidden',
+  },
 })
 export class WorkspacePage {
   // Servicios

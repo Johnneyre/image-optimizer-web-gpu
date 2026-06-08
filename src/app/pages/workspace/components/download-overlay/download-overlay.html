@@ -1,12 +1,14 @@
 @if (isVisible()) {
-  <div [class]="(theme() === 'dark' ? 'bg-slate-950/85' : 'bg-white/85') + ' overlay-backdrop'">
-    <div class="overlay-content">
+  <div
+    [class]="(theme() === 'dark' ? 'bg-slate-950/85' : 'bg-white/85') + ' fixed inset-0 z-100 flex items-center justify-center backdrop-blur-[8px] animate-[overlay-fade-in_0.3s_ease-out]'"
+  >
+    <div class="flex flex-col items-center">
       <!-- Animated rings -->
-      <div class="loader-rings">
-        <div class="ring ring-outer"></div>
-        <div class="ring ring-middle"></div>
-        <div class="ring ring-inner"></div>
-        <div class="ring-center">
+      <div class="relative w-[120px] h-[120px]">
+        <div class="absolute rounded-full border-2 border-transparent inset-0 border-t-cyan-500 border-r-cyan-500 animate-[spin_1.5s_linear_infinite]"></div>
+        <div class="absolute rounded-full border-2 border-transparent inset-3 border-b-indigo-400 border-l-indigo-400 animate-[spin_1.2s_linear_infinite_reverse]"></div>
+        <div class="absolute rounded-full border-2 border-transparent inset-6 border-t-cyan-500 border-l-indigo-400 animate-[spin_0.9s_linear_infinite]"></div>
+        <div class="absolute inset-9 flex items-center justify-center animate-[pulse_2s_ease-in-out_infinite]">
           <lucide-icon [img]="icons.Download" class="w-8 h-8 text-cyan-400" />
         </div>
       </div>
