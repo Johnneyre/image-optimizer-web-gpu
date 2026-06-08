@@ -6,7 +6,6 @@ import { LucideAngularModule, Sparkles, Lock, Zap } from 'lucide-angular';
   standalone: true,
   imports: [LucideAngularModule],
   templateUrl: './hero-section.html',
-  styleUrl: './hero-section.css',
 })
 export class HeroSectionComponent {
   readonly icons = { Sparkles, Lock, Zap };

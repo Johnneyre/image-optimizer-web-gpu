@@ -119,9 +119,6 @@ body {
   padding: 0;
   background-color: var(--background);
   color: var(--foreground);
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
 }
 
 /* Prevent text selection on UI elements */
@@ -168,4 +165,34 @@ label,
     color 0.3s ease,
     border-color 0.3s ease,
     box-shadow 0.3s ease;
+}
+
+/* Keyframes for component animations */
+@keyframes featureFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes statFadeInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -6,7 +6,6 @@ import { LucideAngularModule, Sparkles } from 'lucide-angular';
   standalone: true,
   imports: [LucideAngularModule],
   templateUrl: './site-footer.html',
-  styleUrl: './site-footer.css',
 })
 export class SiteFooterComponent {
   readonly icons = { Sparkles };

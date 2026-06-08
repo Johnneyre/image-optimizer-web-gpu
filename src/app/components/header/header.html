@@ -1,41 +1,61 @@
-<header class="site-header">
-  <div class="header-container">
-    <div class="header-brand">
-      <div class="header-logo">
-        <lucide-icon [img]="icons.Zap" [size]="18" [strokeWidth]="2" />
+<header
+  class="border-b border-[oklch(from_var(--border)_l_c_h/0.6)] bg-[oklch(from_var(--background)_l_c_h/0.8)] backdrop-blur-md transition-colors duration-300 ease"
+>
+  <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div
+        class="flex items-center justify-center w-9 h-9 rounded-lg bg-linear-to-br from-(--primary) to-[oklch(from_var(--primary)_l_c_h/0.7)]"
+      >
+        <lucide-icon [img]="icons.Zap" [size]="18" [strokeWidth]="2" class="text-white" />
       </div>
       <div>
-        <h1 class="header-name">ImageOptimize</h1>
-        <p class="header-tagline">WebGPU-Powered</p>
+        <h1 class="m-0 text-lg font-semibold text-(--foreground)">ImageOptimize</h1>
+        <p class="m-0 text-xs text-(--muted-foreground)">WebGPU-Powered</p>
       </div>
     </div>
 
-    <div class="header-actions">
+    <div class="flex items-center gap-4">
       <!-- GPU Status -->
       @if (isInitializing()) {
-        <div class="header-status">
-          <lucide-icon [img]="icons.Loader2" [size]="16" [strokeWidth]="2" class="animate-spin" />
-          <span class="header-status-text">Inicializando WebGPU...</span>
+        <div class="flex items-center gap-2 text-sm text-(--muted-foreground)">
+          <lucide-icon
+            [img]="icons.Loader2"
+            [size]="16"
+            [strokeWidth]="2"
+            class="animate-[spin_1s_linear_infinite]"
+          />
+          <span class="hidden sm:inline">Inicializando WebGPU...</span>
         </div>
       } @else if (isSupported() === false) {
-        <div class="header-status header-status-error">
-          <lucide-icon [img]="icons.AlertCircle" [size]="16" [strokeWidth]="2" />
-          <span class="header-status-text">WebGPU no soportado</span>
+        <div class="flex items-center gap-2 text-sm text-[oklch(0.65_0.2_25)]">
+          <lucide-icon
+            [img]="icons.AlertCircle"
+            [size]="16"
+            [strokeWidth]="2"
+            class="text-[oklch(0.65_0.2_25)]"
+          />
+          <span class="hidden sm:inline">WebGPU no soportado</span>
         </div>
       } @else if (adapterInfo()) {
-        <div class="header-gpu-info">
-          <lucide-icon [img]="icons.Gpu" [size]="14" [strokeWidth]="2" />
+        <div
+          class="hidden md:flex items-center gap-1.5 py-1.5 px-3 rounded-lg border border-(--border) bg-(--muted)/40 font-mono text-xs text-(--muted-foreground)"
+        >
+          <lucide-icon [img]="icons.Gpu" [size]="14" [strokeWidth]="2" class="text-(--primary)" />
           <span>{{ adapterInfo() }}</span>
         </div>
       }
 
       <!-- Theme Toggle -->
       <button
-        class="header-theme-toggle"
+        class="flex items-center justify-center w-10 h-10 rounded-lg border-0 bg-transparent text-(--muted-foreground) cursor-pointer transition-all duration-200 ease hover:bg-(--muted)/50 hover:text-(--foreground) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ring)"
         (click)="onToggleTheme()"
         [title]="theme() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
       >
-        <lucide-icon [img]="theme() === 'dark' ? icons.Sun : icons.Moon" [size]="20" [strokeWidth]="2" />
+        <lucide-icon
+          [img]="theme() === 'dark' ? icons.Sun : icons.Moon"
+          [size]="20"
+          [strokeWidth]="2"
+        />
       </button>
     </div>
   </div>

@@ -31,6 +31,7 @@
   grid-area: content;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 1.5rem;
   opacity: 1;
   transition: opacity 0.5s ease-out;
@@ -71,7 +72,6 @@
   pointer-events: none;
   z-index: 0;
   visibility: hidden;
-  position: absolute;
 }
 
 @media (min-width: 1024px) {
@@ -172,6 +172,9 @@
   grid-area: content;
   opacity: 0;
   transition: opacity 0.6s ease-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .cards-layout.phase-hidden {

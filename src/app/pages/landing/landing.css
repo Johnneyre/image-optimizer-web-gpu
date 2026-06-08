@@ -2,13 +2,6 @@
   display: block;
 }
 
-/* Theme transition synchronized with header/app shell */
-.landing-page {
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
-}
-
 /* Background grid - requires custom CSS for complex gradients and masks */
 .landing-grid-bg {
   position: absolute;
