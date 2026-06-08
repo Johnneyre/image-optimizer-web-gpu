@@ -143,94 +143,17 @@ async function initializeWebGPU(): Promise<InitResult> {
     });
 
     const adapterInfo = adapter.info;
-    console.log('adapterInfo', adapterInfo);
-
-    console.log('[WebGPU Worker] GPU Adapter Info:', {
-      vendor: adapterInfo?.vendor,
-      architecture: adapterInfo?.architecture,
-      device: adapterInfo?.device,
-      description: adapterInfo?.description,
-    });
-
-    // Para mostrar al usuario
-    const displayName = getAdapterDisplayName(adapterInfo);
-
-    console.log('displayName', displayName);
-
-    // Para logs de debugging
-    const fullDetails = getAdapterDetails(adapterInfo);
-    console.log('[WebGPU Worker] GPU Adapter Details:', fullDetails);
-
     const info = adapterInfo
-      ? adapterInfo.description ||
-        adapterInfo.device ||
-        `${adapterInfo.vendor} - ${adapterInfo.architecture}`
+      ? `${adapterInfo.vendor} - ${adapterInfo.architecture}`
       : 'WebGPU Ready';
-
-    console.log('info', info);
-
     return {
       type: 'init-complete',
       supported: true,
-      adapterInfo: displayName, // Ej: "NVIDIA GeForce RTX 4050 Laptop GPU"
+      adapterInfo: info,
     };
-  } catch (error) {
-    console.error('[WebGPU Worker] Initialization failed:', error);
+  } catch {
     return { type: 'init-complete', supported: false };
   }
-}
-
-function getAdapterDisplayName(adapterInfo: GPUAdapterInfo | null): string {
-  if (!adapterInfo) return 'WebGPU Ready';
-
-  // 1. Intentar description primero (nombre comercial completo)
-  if (adapterInfo.description && adapterInfo.description.trim()) {
-    return adapterInfo.description;
-  }
-
-  // 2. Construir con vendor + architecture + device si hay info
-  const parts: string[] = [];
-
-  if (adapterInfo.vendor) {
-    // Capitalizar vendor para mejor lectura
-    const vendorName = adapterInfo.vendor.charAt(0).toUpperCase() + adapterInfo.vendor.slice(1);
-    parts.push(vendorName);
-  }
-
-  if (adapterInfo.architecture) {
-    parts.push(adapterInfo.architecture.toUpperCase());
-  }
-
-  if (adapterInfo.device && adapterInfo.device !== '') {
-    parts.push(`[${adapterInfo.device}]`);
-  }
-
-  if (parts.length > 0) {
-    return parts.join(' ');
-  }
-
-  // 3. Fallback genérico
-  return 'GPU Desconocida';
-}
-
-function getAdapterDetails(adapterInfo: GPUAdapterInfo | null): Record<string, string> {
-  if (!adapterInfo) return {};
-
-  const details: Record<string, string> = {};
-
-  // Info estándar
-  if (adapterInfo.vendor) details['Fabricante'] = adapterInfo.vendor;
-  if (adapterInfo.architecture) details['Arquitectura'] = adapterInfo.architecture;
-  if (adapterInfo.device) details['Device ID'] = adapterInfo.device;
-  if (adapterInfo.description) details['Descripción'] = adapterInfo.description;
-
-  // Info no estándar (solo en Chrome con developer features)
-  const info = adapterInfo as any;
-  if (info.type) details['Tipo'] = info.type;
-  if (info.backend) details['Backend'] = info.backend;
-  if (info.driver) details['Driver'] = info.driver;
-
-  return details;
 }
 
 // ============================================================================
