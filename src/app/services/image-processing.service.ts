@@ -95,6 +95,9 @@ export class ImageProcessingService implements OnDestroy {
       const isReady = this.isReady();
       const hasAdjustments = this.hasImageAdjustments();
 
+      // Track outputFormat so format changes trigger re-processing
+      this.outputFormat();
+
       if (file && isReady) {
         untracked(() => {
           // CASO ESPECIAL: quality=100% sin ajustes → usar archivo original
@@ -109,6 +112,9 @@ export class ImageProcessingService implements OnDestroy {
             this.lastGpuParams.contrast !== params.contrast;
 
           const needsGpu = gpuParamsChanged || !this.workerHasCache;
+
+          // Activate processing state immediately to prevent UI flash
+          this.isProcessing.set(true);
 
           this.processRequest$.next({ file, params, needsGpu });
         });
