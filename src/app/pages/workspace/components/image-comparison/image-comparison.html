@@ -12,20 +12,71 @@
     (mousedown)="onImageMouseDown($event)"
     (wheel)="onWheel($event)"
   >
-    <!-- Processed Image (fondo completo) -->
-    @if (processedImageUrl()) {
+    <!-- Original fallback: visible until a processed image is fully committed -->
+    @if (!committedProcessedUrl() && originalImageUrl()) {
       <div
         class="absolute inset-0 flex items-center justify-center"
         [style.transform]="transformStyle()"
         [style.transform-origin]="'center center'"
       >
         <img
-          [src]="processedImageUrl()"
-          alt="Procesada"
+          [src]="originalImageUrl()"
+          alt="Original"
           class="max-w-full max-h-full object-contain"
           draggable="false"
           (load)="onImageLoad($event)"
         />
+      </div>
+    }
+
+    <!-- Processed image stack: tracked by URL so persistent layers keep the same DOM element -->
+    @for (layer of imageLayers(); track layer.url) {
+      <div
+        class="absolute inset-0 flex items-center justify-center transition-opacity duration-300"
+        [class.opacity-0]="layer.fadeIn && !processedImageLoaded()"
+        [style.transform]="transformStyle()"
+        [style.transform-origin]="'center center'"
+      >
+        <img
+          [src]="layer.url"
+          alt="Procesada"
+          class="max-w-full max-h-full object-contain"
+          draggable="false"
+          (load)="onLayerLoad(layer, $event)"
+        />
+      </div>
+    }
+
+    <!-- Processing Overlay (right side only, clipped to image area) -->
+    @if (isProcessing() && originalImageUrl() && !processedImageUrl()) {
+      <!-- Animated color overlay clipped to image bounds -->
+      <div
+        class="absolute z-10 pointer-events-none processing-color-overlay"
+        [style]="processingOverlayStyle()"
+      ></div>
+
+      <!-- Processing text/icon centered on the right side -->
+      <div
+        class="absolute z-10 flex items-center justify-center pointer-events-none"
+        [style]="processingOverlayStyle()"
+      >
+        <div class="flex flex-col items-center gap-3 px-4">
+          <div
+            class="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm"
+            [class]="theme() === 'dark' ? 'bg-slate-800/60' : 'bg-white/60'"
+          >
+            <lucide-icon [img]="icons.Loader2" class="w-6 h-6 animate-spin text-cyan-500" />
+          </div>
+          <div class="text-center">
+            <p class="text-sm font-medium text-cyan-500">Procesando</p>
+            <p
+              class="text-xs mt-0.5"
+              [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'"
+            >
+              WebGPU Worker
+            </p>
+          </div>
+        </div>
       </div>
     }
 

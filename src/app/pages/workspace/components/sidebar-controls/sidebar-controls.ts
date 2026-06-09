@@ -35,8 +35,11 @@ export class SidebarControlsComponent {
   readonly brightness = input(0);
   readonly contrast = input(1);
   readonly isProcessing = input(false);
+  readonly hasProcessedImage = input(false);
   readonly canDownload = input(false);
   readonly hasStats = input(false);
+
+  readonly shouldBlockControls = computed(() => this.isProcessing() && !this.hasProcessedImage());
 
   // Outputs
   readonly qualityChange = output<number>();

@@ -99,6 +99,33 @@ aside::-webkit-scrollbar-thumb:hover {
 }
 
 /* ============================================================================
+   Disabled States
+   ============================================================================ */
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background-color: inherit;
+  border-color: inherit;
+}
+
+input[type='range']:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input[type='range']:disabled::-webkit-slider-thumb {
+  cursor: not-allowed;
+}
+
+input[type='range']:disabled::-moz-range-thumb {
+  cursor: not-allowed;
+}
+
+/* ============================================================================
    Responsive
    ============================================================================ */
 

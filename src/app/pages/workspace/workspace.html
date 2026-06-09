@@ -27,6 +27,7 @@
       [brightness]="brightness()"
       [contrast]="contrast()"
       [isProcessing]="isProcessing()"
+      [hasProcessedImage]="!!processedImageUrl()"
       [canDownload]="canDownload()"
       [hasStats]="hasStats()"
       (qualityChange)="onQualityChange($event)"

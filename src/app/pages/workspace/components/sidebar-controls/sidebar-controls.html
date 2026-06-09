@@ -71,8 +71,15 @@
   }
 
   <!-- Controls -->
-  <div class="flex-1 overflow-y-auto">
-    <div class="p-4 space-y-6">
+  <div class="flex-1 overflow-y-auto relative">
+    @if (shouldBlockControls()) {
+      <!-- Block interaction overlay -->
+      <div
+        class="absolute inset-0 z-20 cursor-not-allowed"
+        [class]="theme() === 'dark' ? 'bg-slate-900/30' : 'bg-white/30'"
+      ></div>
+    }
+    <div class="p-4 space-y-6" [class.opacity-60]="shouldBlockControls()">
       <!-- Quality Presets -->
       <div>
         <label class="block text-sm font-medium mb-3">Presets de Calidad</label>
@@ -87,6 +94,7 @@
                     : 'bg-slate-50 border-slate-200 hover:border-slate-300') +
                 ' p-2 rounded-lg border text-center transition-all'
               "
+              [disabled]="shouldBlockControls()"
               (click)="onSelectPreset(preset.value)"
             >
               <span class="text-sm font-medium">{{ preset.label }}</span>
@@ -114,6 +122,7 @@
           min="1"
           max="100"
           [value]="quality()"
+          [disabled]="shouldBlockControls()"
           (input)="onQualityChange($event)"
           [class]="
             (theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200') +
@@ -152,6 +161,7 @@
           max="1"
           step="0.01"
           [value]="brightness()"
+          [disabled]="shouldBlockControls()"
           (input)="onBrightnessChange($event)"
           [class]="
             (theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200') +
@@ -181,6 +191,7 @@
           max="2"
           step="0.01"
           [value]="contrast()"
+          [disabled]="shouldBlockControls()"
           (input)="onContrastChange($event)"
           [class]="
             (theme() === 'dark' ? 'bg-slate-700' : 'bg-slate-200') +
@@ -197,6 +208,7 @@
             : 'bg-slate-50 hover:bg-slate-100 border-slate-200') +
           ' w-full py-2 px-4 flex items-center justify-center gap-2 rounded-lg border transition-colors'
         "
+        [disabled]="shouldBlockControls()"
         (click)="onResetAdjustments()"
       >
         <lucide-icon [img]="icons.RotateCcw" class="w-4 h-4" />
@@ -217,6 +229,7 @@
                     : 'bg-slate-50 border-slate-200 hover:border-slate-300') +
                 ' p-2 rounded-lg border text-center transition-all text-sm font-medium'
               "
+              [disabled]="shouldBlockControls()"
               (click)="onFormatChange(fmt.value)"
             >
               {{ fmt.label }}

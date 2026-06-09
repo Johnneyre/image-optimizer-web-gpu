@@ -63,6 +63,28 @@ export class ImageComparisonComponent implements OnDestroy {
   readonly imageNaturalWidth = signal(0);
   readonly imageNaturalHeight = signal(0);
 
+  // Track when processed image has fully loaded (for fade-in)
+  readonly processedImageLoaded = signal(false);
+
+  // The URL currently committed as background (updates only after fade-in completes)
+  readonly committedProcessedUrl = signal<string | null>(null);
+  private commitTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  // Image layers stack: committed underneath (when present) + pending on top fading in.
+  // Tracked by URL so an entry that persists across stack changes keeps the same DOM element.
+  readonly imageLayers = computed<{ url: string; fadeIn: boolean }[]>(() => {
+    const committed = this.committedProcessedUrl();
+    const pending = this.processedImageUrl();
+
+    if (!pending && !committed) return [];
+    if (!committed) return [{ url: pending as string, fadeIn: true }];
+    if (!pending || pending === committed) return [{ url: committed, fadeIn: false }];
+    return [
+      { url: committed, fadeIn: false },
+      { url: pending, fadeIn: true },
+    ];
+  });
+
   // Computed: displayed image dimensions (with object-contain, before zoom)
   readonly displayedImageDimensions = computed(() => {
     const containerW = this.containerWidth();
@@ -134,6 +156,48 @@ export class ImageComparisonComponent implements OnDestroy {
     return { min: minPercent, max: maxPercent, top: topPercent, height: heightPercent };
   });
 
+  // Computed: processing overlay position/dimensions (clamped to image area)
+  readonly processingOverlayStyle = computed(() => {
+    const containerW = this.containerWidth();
+    const containerH = this.containerHeight();
+    const dims = this.displayedImageDimensions();
+    const zoom = this.zoomLevel();
+    const pan = this.panOffset();
+    const sliderPos = this.sliderPosition();
+
+    if (containerW === 0 || containerH === 0 || dims.width === 0 || this.imageNaturalWidth() === 0 || this.imageNaturalHeight() === 0) {
+      return { display: 'none' };
+    }
+
+    const containerCenterX = containerW / 2;
+    const containerCenterY = containerH / 2;
+
+    const scaledWidth = dims.width * zoom;
+    const scaledHeight = dims.height * zoom;
+
+    const scaledImageLeft = containerCenterX - scaledWidth / 2 + pan.x * zoom;
+    const scaledImageRight = containerCenterX + scaledWidth / 2 + pan.x * zoom;
+    const scaledImageTop = containerCenterY - scaledHeight / 2 + pan.y * zoom;
+    const scaledImageBottom = containerCenterY + scaledHeight / 2 + pan.y * zoom;
+
+    const sliderLeftPx = (sliderPos / 100) * containerW;
+
+    const left = Math.max(sliderLeftPx, scaledImageLeft);
+    const right = Math.min(containerW, scaledImageRight);
+    const top = Math.max(0, scaledImageTop);
+    const bottom = Math.min(containerH, scaledImageBottom);
+
+    const width = Math.max(0, right - left);
+    const height = Math.max(0, bottom - top);
+
+    return {
+      top: `${top}px`,
+      left: `${left}px`,
+      width: `${width}px`,
+      height: `${height}px`,
+    };
+  });
+
   // Computed: pan limits to prevent image from going out of view
   readonly panLimits = computed(() => {
     const containerW = this.containerWidth();
@@ -194,6 +258,20 @@ export class ImageComparisonComponent implements OnDestroy {
         this.sliderPosition.set(bounds.max);
       }
     });
+
+    // Reset load state when a new processed URL arrives; clear committed if cleared
+    effect(() => {
+      const url = this.processedImageUrl();
+      this.processedImageLoaded.set(false);
+      if (this.commitTimeoutId !== null) {
+        clearTimeout(this.commitTimeoutId);
+        this.commitTimeoutId = null;
+      }
+      // If the image was cleared entirely, also clear committed background
+      if (url === null) {
+        this.committedProcessedUrl.set(null);
+      }
+    });
   }
 
   private setupResizeObserver(): void {
@@ -217,6 +295,10 @@ export class ImageComparisonComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
+    if (this.commitTimeoutId !== null) {
+      clearTimeout(this.commitTimeoutId);
+      this.commitTimeoutId = null;
+    }
   }
 
   // ============================================================================
@@ -302,6 +384,26 @@ export class ImageComparisonComponent implements OnDestroy {
     const img = event.target as HTMLImageElement;
     this.imageNaturalWidth.set(img.naturalWidth);
     this.imageNaturalHeight.set(img.naturalHeight);
+  }
+
+  onLayerLoad(layer: { url: string; fadeIn: boolean }, event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (this.imageNaturalWidth() === 0 || this.imageNaturalHeight() === 0) {
+      this.imageNaturalWidth.set(img.naturalWidth);
+      this.imageNaturalHeight.set(img.naturalHeight);
+    }
+
+    if (!layer.fadeIn) return;
+
+    this.processedImageLoaded.set(true);
+    // After the 300ms fade-in completes, commit the new URL as the base layer
+    if (this.commitTimeoutId !== null) {
+      clearTimeout(this.commitTimeoutId);
+    }
+    this.commitTimeoutId = setTimeout(() => {
+      this.committedProcessedUrl.set(this.processedImageUrl());
+      this.commitTimeoutId = null;
+    }, 350);
   }
 
   // ============================================================================
