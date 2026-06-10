@@ -13,8 +13,12 @@
         <lucide-icon [img]="icons.Zap" [size]="18" [strokeWidth]="2" class="text-white" />
       </div>
       <div>
-        <h1 class="m-0 text-lg font-semibold text-(--foreground)">ImageOptimize</h1>
-        <p class="m-0 text-xs text-(--muted-foreground)">WebGPU-Powered</p>
+        <h1 class="m-0 text-lg font-semibold text-(--foreground) transition-colors duration-300">
+          ImageOptimize
+        </h1>
+        <p class="m-0 text-xs text-(--muted-foreground) transition-colors duration-300">
+          WebGPU-Powered
+        </p>
       </div>
     </div>
 
@@ -42,7 +46,7 @@
         </div>
       } @else if (adapterInfo()) {
         <div
-          class="hidden md:flex items-center gap-1.5 py-1.5 px-3 rounded-lg border border-(--border) bg-(--muted)/40 font-mono text-xs text-(--muted-foreground)"
+          class="hidden md:flex items-center gap-1.5 py-1.5 px-3 rounded-lg border border-(--border) bg-(--muted)/40 font-mono text-xs text-(--muted-foreground) transition-colors duration-300"
         >
           <lucide-icon [img]="icons.Gpu" [size]="14" [strokeWidth]="2" class="text-(--primary)" />
           <span>{{ adapterInfo() }}</span>
