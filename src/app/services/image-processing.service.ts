@@ -116,9 +116,8 @@ export class ImageProcessingService implements OnDestroy {
 
           const needsGpu = gpuParamsChanged || !this.workerHasCache;
 
-          // Activate processing state immediately to prevent UI flash
-          this.isProcessing.set(true);
-
+          // isProcessing se activa en processInternal, después del debounce:
+          // mover un slider no muestra "Procesando" hasta que el trabajo real empieza
           this.processRequest$.next({ file, params, needsGpu, useOriginal });
         });
       }
