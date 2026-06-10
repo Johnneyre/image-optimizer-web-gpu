@@ -239,6 +239,10 @@ export class ImageComparisonComponent implements OnDestroy {
   readonly isPanning = signal(false);
   private panStart = { x: 0, y: 0 };
 
+  // Pinch-to-zoom state (touch)
+  private pinchStartDistance = 0;
+  private pinchStartZoom = 1;
+
   // Computed
   readonly transformStyle = computed(() => {
     const zoom = this.zoomLevel();
@@ -352,16 +356,72 @@ export class ImageComparisonComponent implements OnDestroy {
   @HostListener('document:touchmove', ['$event'])
   onTouchMove(event: TouchEvent): void {
     if (this.isSliderDragging()) {
-      event.preventDefault();
       this.updateSliderPositionFromTouch(event);
+      return;
+    }
+
+    // Pinch-to-zoom (two fingers)
+    if (this.pinchStartDistance > 0 && event.touches.length === 2) {
+      const distance = this.getTouchDistance(event.touches);
+      const scale = distance / this.pinchStartDistance;
+      const newZoom = Math.max(0.25, Math.min(4, this.pinchStartZoom * scale));
+      this.zoomLevel.set(Math.round(newZoom * 100) / 100);
+      return;
+    }
+
+    // One-finger pan when zoomed in
+    if (this.isPanning() && event.touches.length === 1) {
+      const touch = event.touches[0];
+      const dx = touch.clientX - this.panStart.x;
+      const dy = touch.clientY - this.panStart.y;
+      const limits = this.panLimits();
+
+      this.panOffset.update((current) => {
+        const newX = current.x + dx / this.zoomLevel();
+        const newY = current.y + dy / this.zoomLevel();
+        return {
+          x: Math.max(limits.minX, Math.min(limits.maxX, newX)),
+          y: Math.max(limits.minY, Math.min(limits.maxY, newY)),
+        };
+      });
+      this.panStart = { x: touch.clientX, y: touch.clientY };
     }
   }
 
   @HostListener('document:mouseup')
   @HostListener('document:touchend')
+  @HostListener('document:touchcancel')
   onPointerUp(): void {
     this.isSliderDragging.set(false);
     this.isPanning.set(false);
+    this.pinchStartDistance = 0;
+  }
+
+  onContainerTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 2) {
+      // Start pinch: cancel slider/pan in favor of zoom gesture
+      this.isSliderDragging.set(false);
+      this.isPanning.set(false);
+      this.pinchStartDistance = this.getTouchDistance(event.touches);
+      this.pinchStartZoom = this.zoomLevel();
+      return;
+    }
+
+    if (
+      event.touches.length === 1 &&
+      this.zoomLevel() > 1 &&
+      !this.isSliderDragging() &&
+      this.pinchStartDistance === 0
+    ) {
+      this.isPanning.set(true);
+      this.panStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    }
+  }
+
+  private getTouchDistance(touches: TouchList): number {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
   }
 
   private updateSliderPosition(event: MouseEvent): void {

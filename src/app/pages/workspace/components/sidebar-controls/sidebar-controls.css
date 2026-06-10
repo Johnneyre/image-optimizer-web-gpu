@@ -129,13 +129,16 @@ input[type='range']:disabled::-moz-range-thumb {
    Responsive
    ============================================================================ */
 
+/* Touch devices: bigger thumb + taller hit area while keeping the track thin.
+   The Tailwind bg paints only the content box (the 8px visual track); the
+   transparent vertical padding extends the touchable surface to 32px. */
 @media (max-width: 1024px) {
-  aside {
-    max-height: 50vh;
+  input[type='range'].slider-thumb {
+    height: 32px;
+    padding: 12px 0;
+    background-clip: content-box;
   }
-}
 
-@media (max-width: 640px) {
   .slider-thumb::-webkit-slider-thumb {
     width: 24px;
     height: 24px;

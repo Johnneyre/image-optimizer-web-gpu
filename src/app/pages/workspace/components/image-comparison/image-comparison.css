@@ -23,6 +23,14 @@
   right: -12px;
 }
 
+/* Touch: franja de agarre más ancha (44px en total) */
+@media (max-width: 1024px) {
+  .slider-handle::before {
+    left: -20px;
+    right: -20px;
+  }
+}
+
 /* Prevent image selection during drag */
 img {
   user-select: none;

@@ -67,6 +67,10 @@ export class SidebarControlsComponent {
   // Local state
   readonly selectedPreset = signal<number | null>(80);
   readonly selectedFormat = signal<DownloadFormat>('image/webp');
+  readonly activeTab = signal<'quality' | 'adjustments'>('quality');
+
+  // Dot indicator on the "Ajustes" tab when brightness/contrast deviate from defaults
+  readonly hasActiveAdjustments = computed(() => this.brightness() !== 0 || this.contrast() !== 1);
 
   readonly qualityPresets: QualityPreset[] = [
     { label: '100%', value: 100, description: 'Original' },
@@ -105,6 +109,10 @@ export class SidebarControlsComponent {
     effect(() => {
       this.selectedFormat.set(this.outputFormat());
     });
+  }
+
+  onSelectTab(tab: 'quality' | 'adjustments'): void {
+    this.activeTab.set(tab);
   }
 
   onSelectPreset(value: number): void {
