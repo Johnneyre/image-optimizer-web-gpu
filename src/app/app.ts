@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { LucideAngularModule, AlertCircle } from 'lucide-angular';
+import { LucideAngularModule, CircleAlert } from 'lucide-angular';
 import { ImageProcessingService } from './services/image-processing.service';
 import { ThemeService } from './services/theme.service';
 import { HeaderComponent } from './components/header/header';
@@ -17,7 +17,7 @@ export class App {
   private readonly imageService = inject(ImageProcessingService);
   readonly themeService = inject(ThemeService);
 
-  readonly icons = { AlertCircle };
+  readonly icons = { CircleAlert };
 
   readonly theme = this.themeService.theme;
 

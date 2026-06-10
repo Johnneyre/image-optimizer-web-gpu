@@ -10,7 +10,8 @@ export class ThemeService {
   readonly theme = signal<Theme>('dark');
 
   constructor() {
-    if (this.isBrowser) {
+    // matchMedia puede no existir en entornos sin implementación completa de DOM (p.ej. jsdom)
+    if (this.isBrowser && typeof globalThis.matchMedia === 'function') {
       // Load saved theme or detect system preference
       const savedTheme = localStorage.getItem('theme') as Theme | null;
       if (savedTheme) {

@@ -3,6 +3,7 @@
 import type {
   ProcessImageMessage,
   EncodeMessage,
+  EncodeFileMessage,
   WorkerMessage,
   ProcessResult,
   InitResult,
@@ -94,6 +95,53 @@ let processingLock: Promise<void> = Promise.resolve();
 
 // Cache del último resultado RGBA para re-encoding sin GPU
 let rgbaCache: RgbaCache | null = null;
+
+// Canvas reutilizables: evitan asignar cientos de MB por operación con imágenes grandes
+let extractCanvas: OffscreenCanvas | null = null;
+let extractCtx: OffscreenCanvasRenderingContext2D | null = null;
+let encodeCanvas: OffscreenCanvas | null = null;
+let encodeCtx: OffscreenCanvasRenderingContext2D | null = null;
+
+function getExtractContext(width: number, height: number): OffscreenCanvasRenderingContext2D {
+  if (!extractCanvas || !extractCtx) {
+    extractCanvas = new OffscreenCanvas(width, height);
+    extractCtx = extractCanvas.getContext('2d', { willReadFrequently: true });
+    if (!extractCtx) throw new Error('No se pudo crear contexto 2D en OffscreenCanvas');
+  } else if (extractCanvas.width !== width || extractCanvas.height !== height) {
+    extractCanvas.width = width;
+    extractCanvas.height = height;
+  }
+  return extractCtx;
+}
+
+function getEncodeContext(width: number, height: number): OffscreenCanvasRenderingContext2D {
+  if (!encodeCanvas || !encodeCtx) {
+    encodeCanvas = new OffscreenCanvas(width, height);
+    encodeCtx = encodeCanvas.getContext('2d');
+    if (!encodeCtx) throw new Error('No se pudo crear contexto 2D en OffscreenCanvas');
+  } else if (encodeCanvas.width !== width || encodeCanvas.height !== height) {
+    encodeCanvas.width = width;
+    encodeCanvas.height = height;
+  }
+  return encodeCtx;
+}
+
+function releaseCaches(): void {
+  rgbaCache = null;
+
+  if (bufferCache) {
+    bufferCache.inputBuffer.destroy();
+    bufferCache.outputBuffer.destroy();
+    bufferCache.stagingBuffer.destroy();
+    bufferCache.bindGroup = null;
+    bufferCache = null;
+  }
+
+  extractCanvas = null;
+  extractCtx = null;
+  encodeCanvas = null;
+  encodeCtx = null;
+}
 
 // ============================================================================
 // Inicialización WebGPU
@@ -237,13 +285,10 @@ async function encodeImage(
     finalQuality = 0.98;
   }
 
-  const canvas = new OffscreenCanvas(width, height);
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('No se pudo crear contexto 2D en OffscreenCanvas');
-
+  const ctx = getEncodeContext(width, height);
   ctx.putImageData(imageData, 0, 0);
 
-  const blob = await canvas.convertToBlob({
+  const blob = await ctx.canvas.convertToBlob({
     type: format,
     quality: finalQuality,
   });
@@ -299,10 +344,7 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
 
   try {
     // Extraer píxeles
-    const canvas = new OffscreenCanvas(width, height);
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('No se pudo crear contexto 2D');
-
+    const ctx = getExtractContext(width, height);
     ctx.drawImage(imageBitmap, 0, 0);
     const imageData = ctx.getImageData(0, 0, width, height);
     const inputData = new Uint8Array(imageData.data.buffer);
@@ -443,24 +485,61 @@ async function reEncode(message: EncodeMessage): Promise<ProcessResult | null> {
   };
 }
 
+// Encode directo de un bitmap (sin GPU, sin tocar el cache RGBA)
+// Usado para convertir el archivo original a otro formato en la descarga
+async function encodeFile(message: EncodeFileMessage): Promise<ProcessResult> {
+  const { imageBitmap, outputFormat, outputQuality, requestId } = message;
+  const { width, height } = imageBitmap;
+
+  try {
+    const tStart = performance.now();
+
+    let finalQuality = outputQuality;
+    if (finalQuality >= 1) {
+      finalQuality = 0.98;
+    }
+
+    const ctx = getEncodeContext(width, height);
+    ctx.drawImage(imageBitmap, 0, 0);
+
+    const blob = await ctx.canvas.convertToBlob({
+      type: outputFormat,
+      quality: finalQuality,
+    });
+
+    const buffer = await blob.arrayBuffer();
+    const encodingTimeMs = performance.now() - tStart;
+
+    return {
+      type: 'result',
+      blobData: buffer,
+      blobType: blob.type,
+      blobSize: buffer.byteLength,
+      width,
+      height,
+      processingTimeMs: 0,
+      encodingTimeMs,
+      requestId,
+    };
+  } finally {
+    imageBitmap.close();
+  }
+}
+
 function cleanup(): void {
   try {
-    bufferCache?.inputBuffer.destroy();
-    bufferCache?.outputBuffer.destroy();
-    bufferCache?.stagingBuffer.destroy();
+    releaseCaches();
     paramsBuffer?.destroy();
     device?.destroy();
   } catch {
     // Ignorar errores durante cleanup de recursos GPU
   }
 
-  bufferCache = null;
   paramsBuffer = null;
   pipeline = null;
   device = null;
   adapter = null;
   isDeviceLost = false;
-  rgbaCache = null;
 }
 
 // ============================================================================
@@ -483,6 +562,9 @@ globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         const result = await processImage(message);
         if (result) {
           self.postMessage(result, [result.blobData]);
+        } else {
+          // Request descartada por una más reciente: responder siempre para que el main thread no deje promesas pendientes huérfanas
+          self.postMessage({ type: 'cancelled', requestId: message.requestId });
         }
         break;
       }
@@ -492,7 +574,16 @@ globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         const result = await reEncode(message);
         if (result) {
           self.postMessage(result, [result.blobData]);
+        } else {
+          self.postMessage({ type: 'cancelled', requestId: message.requestId });
         }
+        break;
+      }
+
+      case 'encode-file': {
+        // Independiente del flujo de procesamiento: no toca currentRequestId
+        const result = await encodeFile(message);
+        self.postMessage(result, [result.blobData]);
         break;
       }
 
@@ -500,6 +591,11 @@ globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         if (message.requestId > currentRequestId) {
           currentRequestId = message.requestId;
         }
+        break;
+      }
+
+      case 'clear-cache': {
+        releaseCaches();
         break;
       }
 

@@ -20,7 +20,7 @@ import {
   ZoomOut,
   RotateCcw,
   X,
-  Loader2,
+  LoaderCircle,
 } from 'lucide-angular';
 import type { Theme } from '@types';
 
@@ -51,7 +51,7 @@ export class ImageComparisonComponent implements OnDestroy {
     ZoomOut,
     RotateCcw,
     X,
-    Loader2,
+    LoaderCircle,
   };
 
   // Container size (updated via ResizeObserver)
@@ -165,7 +165,13 @@ export class ImageComparisonComponent implements OnDestroy {
     const pan = this.panOffset();
     const sliderPos = this.sliderPosition();
 
-    if (containerW === 0 || containerH === 0 || dims.width === 0 || this.imageNaturalWidth() === 0 || this.imageNaturalHeight() === 0) {
+    if (
+      containerW === 0 ||
+      containerH === 0 ||
+      dims.width === 0 ||
+      this.imageNaturalWidth() === 0 ||
+      this.imageNaturalHeight() === 0
+    ) {
       return { display: 'none' };
     }
 

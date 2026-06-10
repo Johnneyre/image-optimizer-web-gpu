@@ -1,6 +1,6 @@
-import { Component, signal, computed, inject, afterNextRender } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { LucideAngularModule, AlertCircle } from 'lucide-angular';
+import { LucideAngularModule, CircleAlert } from 'lucide-angular';
 import { ImageProcessingService } from '@services/image-processing.service';
 import { ThemeService } from '@services/theme.service';
 import { ImageComparisonComponent } from './components/image-comparison/image-comparison';
@@ -28,7 +28,7 @@ export class WorkspacePage {
   private readonly themeService = inject(ThemeService);
 
   // Iconos
-  readonly icons = { AlertCircle };
+  readonly icons = { CircleAlert };
 
   readonly isDownloading = signal(false);
 
@@ -38,6 +38,7 @@ export class WorkspacePage {
   readonly quality = this.imageService.quality;
   readonly brightness = this.imageService.brightness;
   readonly contrast = this.imageService.contrast;
+  readonly outputFormat = this.imageService.outputFormat;
   readonly stats = this.imageService.stats;
   readonly hasImage = this.imageService.hasImage;
 
@@ -66,9 +67,17 @@ export class WorkspacePage {
 
     const diff = stats.originalSize - stats.processedSize;
     const percent = stats.compressionRatio.toFixed(1);
+
+    let percentLabel = '0%';
+    if (diff > 0) {
+      percentLabel = `-${percent}%`;
+    } else if (diff < 0) {
+      percentLabel = `+${Math.abs(Number.parseFloat(percent))}%`;
+    }
+
     return {
       bytes: this.formatFileSize(Math.abs(diff)),
-      percent: diff > 0 ? `-${percent}%` : `+${Math.abs(Number.parseFloat(percent))}%`,
+      percent: percentLabel,
       isReduction: diff > 0,
     };
   });
@@ -79,15 +88,6 @@ export class WorkspacePage {
   });
 
   readonly hasStats = computed(() => this.stats() !== null);
-
-  constructor() {
-    afterNextRender(() => {
-      // Guard: redirect if no image loaded
-      if (!this.hasImage()) {
-        this.router.navigate(['/']);
-      }
-    });
-  }
 
   onQualityChange(value: number): void {
     this.imageService.setQuality(value);

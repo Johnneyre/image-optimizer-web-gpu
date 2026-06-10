@@ -1,15 +1,11 @@
 import { inject } from '@angular/core';
 import { Router, type CanActivateFn, type Routes } from '@angular/router';
+import { ImageProcessingService } from '@services/image-processing.service';
 
-const workspaceReloadGuard: CanActivateFn = () => {
+const workspaceImageGuard: CanActivateFn = () => {
   const router = inject(Router);
-  const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-  const isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
-  if (isReload) {
-    router.navigateByUrl('/', { replaceUrl: true });
-    return false;
-  }
-  return true;
+  const imageService = inject(ImageProcessingService);
+  return imageService.hasImage() ? true : router.createUrlTree(['/']);
 };
 
 export const routes: Routes = [
@@ -19,7 +15,7 @@ export const routes: Routes = [
   },
   {
     path: 'workspace',
-    canActivate: [workspaceReloadGuard],
+    canActivate: [workspaceImageGuard],
     loadComponent: () => import('./pages/workspace/workspace').then((m) => m.WorkspacePage),
   },
   { path: '**', redirectTo: '' },

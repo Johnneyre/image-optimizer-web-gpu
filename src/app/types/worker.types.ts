@@ -47,6 +47,14 @@ export interface EncodeMessage {
   requestId: number;
 }
 
+export interface EncodeFileMessage {
+  type: 'encode-file';
+  imageBitmap: ImageBitmap;
+  outputFormat: OutputFormat;
+  outputQuality: number;
+  requestId: number;
+}
+
 export interface InitMessage {
   type: 'init';
 }
@@ -60,7 +68,19 @@ export interface CancelMessage {
   requestId: number;
 }
 
-export type WorkerMessage = ProcessImageMessage | EncodeMessage | InitMessage | DestroyMessage | CancelMessage;
+// Release cached RGBA data and GPU buffers (image was cleared)
+export interface ClearCacheMessage {
+  type: 'clear-cache';
+}
+
+export type WorkerMessage =
+  | ProcessImageMessage
+  | EncodeMessage
+  | EncodeFileMessage
+  | InitMessage
+  | DestroyMessage
+  | CancelMessage
+  | ClearCacheMessage;
 
 // Result now returns encoded blob data instead of raw RGBA
 export interface ProcessResult {
@@ -81,10 +101,15 @@ export interface ErrorResult {
   requestId?: number;
 }
 
+export interface CancelledResult {
+  type: 'cancelled';
+  requestId: number;
+}
+
 export interface InitResult {
   type: 'init-complete';
   supported: boolean;
   adapterInfo?: string;
 }
 
-export type WorkerResult = ProcessResult | ErrorResult | InitResult;
+export type WorkerResult = ProcessResult | ErrorResult | CancelledResult | InitResult;

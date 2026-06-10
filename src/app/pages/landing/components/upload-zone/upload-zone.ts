@@ -1,5 +1,5 @@
 import { Component, signal, inject, viewChild, ElementRef, output } from '@angular/core';
-import { LucideAngularModule, Upload, ImageIcon, FileImage, AlertCircle } from 'lucide-angular';
+import { LucideAngularModule, Upload, ImageIcon, FileImage, CircleAlert } from 'lucide-angular';
 import { ImageProcessingService } from '../../../../services/image-processing.service';
 
 @Component({
@@ -15,7 +15,7 @@ export class UploadZoneComponent {
   readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
   readonly fileSelected = output<File>();
 
-  readonly icons = { Upload, ImageIcon, FileImage, AlertCircle };
+  readonly icons = { Upload, ImageIcon, FileImage, CircleAlert };
 
   readonly isDragging = signal(false);
   readonly isSupported = this.imageService.isSupported;

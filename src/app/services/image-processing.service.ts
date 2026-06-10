@@ -18,9 +18,10 @@ export class ImageProcessingService implements OnDestroy {
   >();
 
   private readonly processRequest$ = new Subject<{
-    file: File | Blob;
+    file: File;
     params: ProcessingParams;
     needsGpu: boolean;
+    useOriginal: boolean;
   }>();
 
   // Signals públicos
@@ -43,6 +44,9 @@ export class ImageProcessingService implements OnDestroy {
   private lastGpuParams: { brightness: number; contrast: number } | null = null;
   // Track if worker has cached RGBA data
   private workerHasCache = false;
+  // URL procesada anterior: sigue visible como capa base durante el fade-in,
+  // así que se revoca recién cuando llega el siguiente resultado
+  private staleProcessedUrl: string | null = null;
 
   // Parámetros reactivos
   readonly quality = signal(80);
@@ -100,11 +104,10 @@ export class ImageProcessingService implements OnDestroy {
 
       if (file && isReady) {
         untracked(() => {
-          // CASO ESPECIAL: quality=100% sin ajustes → usar archivo original
-          if (params.quality === 100 && !hasAdjustments) {
-            this.useOriginalFile(file);
-            return;
-          }
+          // CASO ESPECIAL: quality=100% sin ajustes → usar archivo original.
+          // Pasa por el mismo pipeline para que el debounce descarte requests
+          // intermedias (p.ej. quality=99 al arrastrar el slider hasta 100).
+          const useOriginal = params.quality === 100 && !hasAdjustments;
 
           // Detectar si necesitamos GPU o solo re-encoding
           const gpuParamsChanged =
@@ -116,7 +119,7 @@ export class ImageProcessingService implements OnDestroy {
           // Activate processing state immediately to prevent UI flash
           this.isProcessing.set(true);
 
-          this.processRequest$.next({ file, params, needsGpu });
+          this.processRequest$.next({ file, params, needsGpu, useOriginal });
         });
       }
     });
@@ -125,12 +128,18 @@ export class ImageProcessingService implements OnDestroy {
       .pipe(
         debounceTime(300),
         filter(() => this.isReady()),
-        switchMap(({ file, params, needsGpu }) => {
+        switchMap(({ file, params, needsGpu, useOriginal }) => {
+          if (useOriginal) {
+            this.useOriginalFile(file);
+            this.isProcessing.set(this.pendingRequests.size > 0);
+            return of(null);
+          }
           return from(this.processInternal(file, params, needsGpu)).pipe(
             catchError((error) => {
               if (error.message !== 'Request cancelada') {
                 this.lastError.set(error.message);
               }
+              this.isProcessing.set(this.pendingRequests.size > 0);
               return of(null);
             }),
           );
@@ -144,10 +153,7 @@ export class ImageProcessingService implements OnDestroy {
   }
 
   private useOriginalFile(file: File): void {
-    const oldUrl = this.processedImageUrl();
-    if (oldUrl?.startsWith('blob:')) {
-      URL.revokeObjectURL(oldUrl);
-    }
+    this.rotateStaleProcessedUrl();
 
     this.lastGpuParams = null;
     this.workerHasCache = false;
@@ -156,6 +162,15 @@ export class ImageProcessingService implements OnDestroy {
     this.processedImageUrl.set(url);
     this.processedBlobSize.set(file.size);
     this.processingTimeMs.set(0);
+  }
+
+  // Revoca la URL procesada de hace dos resultados y marca la actual como "stale".
+  // La actual no se revoca aún porque el visor la mantiene como capa base del fade-in.
+  private rotateStaleProcessedUrl(): void {
+    if (this.staleProcessedUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(this.staleProcessedUrl);
+    }
+    this.staleProcessedUrl = this.processedImageUrl();
   }
 
   private initializeWorker(): void {
@@ -196,10 +211,23 @@ export class ImageProcessingService implements OnDestroy {
         this.handleProcessingResult(data as ProcessResult);
         break;
 
+      case 'cancelled':
+        this.handleRequestCancelled(data.requestId);
+        break;
+
       case 'error':
         this.handleProcessingError(data.message, data.requestId);
         break;
     }
+  }
+
+  private handleRequestCancelled(requestId: number): void {
+    const request = this.pendingRequests.get(requestId);
+    if (request) {
+      this.pendingRequests.delete(requestId);
+      request.reject(new Error('Request cancelada'));
+    }
+    this.isProcessing.set(this.pendingRequests.size > 0);
   }
 
   private handleWorkerError(error: ErrorEvent): void {
@@ -238,10 +266,7 @@ export class ImageProcessingService implements OnDestroy {
   }
 
   private updateFromWorkerResult(result: WorkerProcessResult): void {
-    const oldUrl = this.processedImageUrl();
-    if (oldUrl?.startsWith('blob:')) {
-      URL.revokeObjectURL(oldUrl);
-    }
+    this.rotateStaleProcessedUrl();
 
     // Crear blob desde ArrayBuffer recibido del worker
     const blob = new Blob([result.blobData], { type: result.blobType });
@@ -359,7 +384,15 @@ export class ImageProcessingService implements OnDestroy {
       URL.revokeObjectURL(processedUrl);
     }
 
+    if (this.staleProcessedUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(this.staleProcessedUrl);
+    }
+    this.staleProcessedUrl = null;
+
     this.cancelAllRequests();
+
+    // Liberar el cache RGBA y los buffers GPU retenidos en el worker
+    this.worker?.postMessage({ type: 'clear-cache' });
 
     this.currentFile.set(null);
     this.originalImageUrl.set(null);
@@ -374,6 +407,7 @@ export class ImageProcessingService implements OnDestroy {
     this.quality.set(80);
     this.brightness.set(0);
     this.contrast.set(1);
+    this.outputFormat.set('image/webp');
   }
 
   async generateDownloadBlob(
@@ -382,38 +416,60 @@ export class ImageProcessingService implements OnDestroy {
   ): Promise<Blob> {
     // Si estamos usando el archivo original (quality=100% sin ajustes)
     const file = this.currentFile();
-    if (!this.workerHasCache && file) {
-      return file;
+    if (!this.workerHasCache && file && this.worker) {
+      // El formato del archivo ya coincide con el solicitado: descargar tal cual
+      if (file.type === format) {
+        return file;
+      }
+
+      // Formato distinto: convertir el original en el worker (sin GPU)
+      const imageBitmap = await createImageBitmap(file);
+      return this.requestWorkerBlob(
+        { type: 'encode-file', imageBitmap, outputFormat: format, outputQuality: quality },
+        [imageBitmap],
+      );
     }
 
     // Si hay cache en el worker, pedir re-encode con los parámetros de descarga
     if (this.workerHasCache && this.worker) {
-      const requestId = ++this.requestIdCounter;
-
-      return new Promise<Blob>((resolve, reject) => {
-        const handler = (event: MessageEvent) => {
-          const data = event.data;
-          if (data.type === 'result' && data.requestId === requestId) {
-            this.worker!.removeEventListener('message', handler);
-            const blob = new Blob([data.blobData], { type: data.blobType });
-            resolve(blob);
-          } else if (data.type === 'error' && data.requestId === requestId) {
-            this.worker!.removeEventListener('message', handler);
-            reject(new Error(data.message));
-          }
-        };
-
-        this.worker!.addEventListener('message', handler);
-        this.worker!.postMessage({
-          type: 'encode',
-          outputFormat: format,
-          outputQuality: quality,
-          requestId,
-        });
+      return this.requestWorkerBlob({
+        type: 'encode',
+        outputFormat: format,
+        outputQuality: quality,
       });
     }
 
     throw new Error('No hay imagen procesada');
+  }
+
+  // Envía un mensaje de encoding al worker con un listener efímero que resuelve
+  // con el blob resultante (independiente del pipeline reactivo de pendingRequests)
+  private requestWorkerBlob(
+    message: Record<string, unknown>,
+    transfer: Transferable[] = [],
+  ): Promise<Blob> {
+    const requestId = ++this.requestIdCounter;
+
+    return new Promise<Blob>((resolve, reject) => {
+      const handler = (event: MessageEvent) => {
+        const data = event.data;
+        if (data.requestId !== requestId) return;
+
+        if (data.type === 'result') {
+          this.worker!.removeEventListener('message', handler);
+          resolve(new Blob([data.blobData], { type: data.blobType }));
+        } else if (data.type === 'error') {
+          this.worker!.removeEventListener('message', handler);
+          reject(new Error(data.message));
+        } else if (data.type === 'cancelled') {
+          this.worker!.removeEventListener('message', handler);
+          reject(new Error('Request cancelada'));
+        }
+      };
+
+      this.worker!.addEventListener('message', handler);
+      this.worker!.postMessage({ ...message, requestId }, transfer);
+    });
   }
 
   private cancelAllRequests(): void {

@@ -8,7 +8,7 @@ import {
   Contrast,
   RotateCcw,
   Download,
-  Loader2,
+  LoaderCircle,
   FileDown,
   Clock,
   SlidersHorizontal,
@@ -34,6 +34,7 @@ export class SidebarControlsComponent {
   readonly quality = input(80);
   readonly brightness = input(0);
   readonly contrast = input(1);
+  readonly outputFormat = input<DownloadFormat>('image/webp');
   readonly isProcessing = input(false);
   readonly hasProcessedImage = input(false);
   readonly canDownload = input(false);
@@ -57,7 +58,7 @@ export class SidebarControlsComponent {
     Contrast,
     RotateCcw,
     Download,
-    Loader2,
+    LoaderCircle,
     FileDown,
     Clock,
     SlidersHorizontal,
@@ -97,6 +98,12 @@ export class SidebarControlsComponent {
       const q = this.quality();
       const preset = this.qualityPresets.find((p) => p.value === q);
       this.selectedPreset.set(preset ? preset.value : null);
+    });
+
+    // Sync format selection with the service-driven input so the UI never
+    // diverges from the format actually used for processing
+    effect(() => {
+      this.selectedFormat.set(this.outputFormat());
     });
   }
 

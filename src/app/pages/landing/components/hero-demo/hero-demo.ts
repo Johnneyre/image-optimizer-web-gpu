@@ -18,6 +18,7 @@ import {
 export class HeroDemoComponent {
   private readonly destroyRef = inject(DestroyRef);
   private destroyed = false;
+  private startTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   /** Emitted when the single-run animation finishes */
   readonly completed = output<void>();
@@ -45,10 +46,14 @@ export class HeroDemoComponent {
   constructor() {
     this.destroyRef.onDestroy(() => {
       this.destroyed = true;
+      if (this.startTimeoutId !== null) {
+        clearTimeout(this.startTimeoutId);
+        this.startTimeoutId = null;
+      }
     });
 
     afterNextRender(() => {
-      setTimeout(() => this.runAnimation(), 1200);
+      this.startTimeoutId = setTimeout(() => this.runAnimation(), 1200);
     });
   }
 
@@ -113,6 +118,8 @@ export class HeroDemoComponent {
     this.cursorTop.set(95);
     this.cursorLeft.set(90);
 
+    if (this.destroyed) return;
+
     // === STEP 2: GPU Processing ===
     this.stepChange.emit(2);
 
@@ -140,6 +147,8 @@ export class HeroDemoComponent {
     this.showLabelLeft.set(true);
     this.showLabelRight.set(true);
     await this.sleep(300);
+
+    if (this.destroyed) return;
 
     // === STEP 3: Download ===
     this.stepChange.emit(3);
