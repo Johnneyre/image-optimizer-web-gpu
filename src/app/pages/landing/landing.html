@@ -1,10 +1,10 @@
 <main
   id="main-content"
-  class="landing-page min-h-[calc(100dvh-57px)] overflow-x-hidden"
+  class="landing-page min-h-dvh -mt-(--header-height) overflow-x-hidden"
   [class.dark]="theme() === 'dark'"
 >
-  <!-- Unified hero + upload background -->
-  <div class="landing-hero-area relative isolate pb-16">
+  <!-- Unified hero + upload background (extends under the transparent sticky header) -->
+  <div class="landing-hero-area relative isolate pt-(--header-height) pb-16">
     <!-- Background grid -->
     <div class="landing-grid-bg" aria-hidden="true"></div>
 

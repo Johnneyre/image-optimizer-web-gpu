@@ -60,6 +60,9 @@
   --ring: oklch(0.72 0.15 220);
   --radius: 0.75rem;
 
+  /* Layout */
+  --header-height: 70px;
+
   /* Semantic colors */
   --success: oklch(0.72 0.17 162);
   --success-foreground: oklch(1 0 0);

@@ -18,7 +18,7 @@ import type { DownloadRequest, DownloadFormat } from '@types';
   ],
   templateUrl: './workspace.html',
   host: {
-    class: 'block h-[calc(100dvh-70px)] overflow-hidden',
+    class: 'block h-[calc(100dvh_-_var(--header-height))] overflow-hidden',
   },
 })
 export class WorkspacePage {

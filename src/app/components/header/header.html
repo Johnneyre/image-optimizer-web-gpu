@@ -1,11 +1,12 @@
 <header
+  class="h-(--header-height)"
   [class]="
     scrolled()
       ? 'transition-all duration-300 ease border-b border-[oklch(from_var(--border)_l_c_h/0.6)] bg-[oklch(from_var(--background)_l_c_h/0.8)] backdrop-blur-md'
       : 'transition-all duration-300 ease border-b border-transparent bg-transparent'
   "
 >
-  <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+  <div class="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <div
         class="flex items-center justify-center w-9 h-9 rounded-lg bg-linear-to-br from-(--primary) to-[oklch(from_var(--primary)_l_c_h/0.7)]"
