@@ -6,7 +6,8 @@
     "enabled": true
   },
   "assets": {
-    "directory": "dist/image-optimize-webgpu/browser"
+    "directory": "dist/image-optimize-webgpu/browser",
+    "not_found_handling": "single-page-application"
   },
   "compatibility_flags": [
     "nodejs_compat"
