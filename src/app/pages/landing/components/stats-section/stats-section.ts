@@ -9,8 +9,8 @@ import type { Stat } from '@types';
 })
 export class StatsSectionComponent {
   readonly stats: Stat[] = [
-    { label: 'Reducción promedio', value: '~65%' },
-    { label: 'Tiempo de proceso', value: '<50ms' },
+    { label: 'Reducción promedio', value: '~80%' },
+    { label: 'Tiempo de proceso', value: '<250ms' },
     { label: 'Datos enviados', value: '0 bytes' },
   ];
 }
