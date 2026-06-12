@@ -60,25 +60,10 @@
   gap: 0.625rem;
 }
 
-.demo-logo-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: linear-gradient(
-    135deg,
-    var(--primary),
-    oklch(from var(--primary) calc(l - 0.1) c calc(h + 20))
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px oklch(from var(--primary) l c h / 0.25);
-}
-
-.demo-logo-svg {
-  width: 14px;
-  height: 14px;
-  color: var(--primary-foreground);
+.demo-logo {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 2px 8px oklch(from var(--primary) l c h / 0.35));
 }
 
 .demo-brand-name {

@@ -1,7 +1,6 @@
 import { Component, HostListener, input, output, signal } from '@angular/core';
 import {
   LucideAngularModule,
-  Zap,
   Sun,
   Moon,
   LoaderCircle,
@@ -42,7 +41,7 @@ export class HeaderComponent {
   readonly scrolled = signal(false);
 
   // Icons
-  readonly icons = { Zap, Sun, Moon, LoaderCircle, CircleAlert, Gpu };
+  readonly icons = { Sun, Moon, LoaderCircle, CircleAlert, Gpu };
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
