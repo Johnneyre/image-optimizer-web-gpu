@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# El workspace es un editor que requiere una imagen cargada en memoria
+# (redirige a / si se accede directamente), no aporta contenido indexable.
+Disallow: /workspace
+
+Sitemap: https://webgpu-image-optimizer.com/sitemap.xml

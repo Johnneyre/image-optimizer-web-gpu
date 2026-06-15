@@ -16,10 +16,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the header title', async () => {
+  it('should render the brand name in the header', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('WebGPU Image Optimizer');
+    const header = fixture.nativeElement.querySelector('app-header') as HTMLElement;
+    expect(header?.textContent).toContain('WebGPU Image Optimizer');
   });
 });

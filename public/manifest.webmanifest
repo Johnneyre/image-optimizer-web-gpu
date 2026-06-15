@@ -1,0 +1,27 @@
+{
+  "name": "WebGPU Image Optimizer",
+  "short_name": "Image Optimizer",
+  "description": "Comprime y optimiza imágenes en tu navegador con WebGPU. Privado, rápido y sin subir archivos a la nube.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["photo", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "maskable"
+    }
+  ]
+}
