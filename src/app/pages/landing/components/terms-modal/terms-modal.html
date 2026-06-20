@@ -1,0 +1,161 @@
+<dialog #dialog aria-labelledby="terms-title" (cancel)="onCancel($event)" class="terms-dialog">
+  @if (open()) {
+    <!-- Header -->
+    <header
+      class="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 border-b border-(--border)"
+    >
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="flex items-center justify-center w-9 h-9 shrink-0 rounded-lg bg-(--primary)/10">
+          <lucide-icon
+            [img]="icons.FileText"
+            [size]="18"
+            class="text-(--primary)"
+            aria-hidden="true"
+          />
+        </span>
+        <h2 id="terms-title" class="m-0 text-base sm:text-lg font-semibold text-(--foreground)">
+          Términos y Condiciones
+        </h2>
+      </div>
+      <button
+        type="button"
+        (click)="close()"
+        aria-label="Cerrar términos y condiciones"
+        class="flex items-center justify-center w-9 h-9 shrink-0 rounded-lg text-(--muted-foreground) transition-colors hover:bg-(--muted)/60 hover:text-(--foreground) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ring) touch-manipulation"
+      >
+        <lucide-icon [img]="icons.X" [size]="18" />
+      </button>
+    </header>
+
+    <!-- Scrollable content -->
+    <article class="terms-content flex-1 overflow-y-auto px-5 sm:px-6 py-5">
+      <h3>1. Aceptación de los términos</h3>
+      <p>
+        Al acceder y utilizar <strong>WebGPU Image Optimizer</strong> (en adelante, «el Servicio»)
+        aceptas quedar vinculado por estos Términos y Condiciones. Si no estás de acuerdo con alguna
+        parte de los mismos, te pedimos que no utilices el Servicio.
+      </p>
+
+      <h3>2. Descripción del servicio</h3>
+      <p>
+        El Servicio es una herramienta web gratuita que permite comprimir y optimizar imágenes
+        (ajuste de calidad, brillo y contraste) y exportarlas en formatos WebP o JPEG. Todo el
+        procesamiento se realiza <strong>localmente en tu dispositivo</strong>, utilizando la
+        tecnología WebGPU de tu navegador.
+      </p>
+
+      <h3>3. Privacidad y procesamiento local de tus imágenes</h3>
+      <p>
+        Tus imágenes <strong>nunca se suben ni se transmiten a ningún servidor</strong>. La carga, el
+        procesamiento y la exportación ocurren en su totalidad dentro de tu navegador, y las imágenes
+        solo permanecen en la memoria de tu dispositivo durante la sesión.
+      </p>
+      <ul>
+        <li>No recopilamos, almacenamos ni tenemos acceso a las imágenes que procesas.</li>
+        <li>No utilizamos cookies, píxeles de seguimiento ni herramientas de analítica.</li>
+        <li>No vendemos ni compartimos datos personales con terceros.</li>
+      </ul>
+      <p>
+        El Servicio se distribuye como archivos estáticos a través de un proveedor de alojamiento.
+        Como ocurre con cualquier sitio web, dicho proveedor puede procesar
+        <strong>metadatos técnicos de conexión</strong> (como la dirección IP o el tipo de navegador)
+        con fines de entrega del contenido y seguridad. Estos datos son gestionados por el proveedor
+        de alojamiento y no son recopilados por nosotros.
+      </p>
+
+      <h3>4. Almacenamiento en tu navegador</h3>
+      <p>
+        El Servicio guarda una única preferencia en el almacenamiento local (<em>localStorage</em>)
+        de tu navegador: el tema visual elegido (claro u oscuro). Esta información permanece en tu
+        dispositivo, no contiene datos personales y puedes eliminarla en cualquier momento borrando
+        los datos de navegación.
+      </p>
+
+      <h3>5. Uso aceptable</h3>
+      <p>Al utilizar el Servicio te comprometes a:</p>
+      <ul>
+        <li>
+          Procesar únicamente imágenes sobre las que tienes los derechos o autorizaciones necesarios.
+        </li>
+        <li>
+          No utilizar el Servicio para contenidos ilícitos, que infrinjan derechos de terceros o que
+          vulneren la legislación aplicable.
+        </li>
+        <li>
+          No intentar interferir, dañar o comprometer el funcionamiento del Servicio ni la seguridad
+          de otros usuarios.
+        </li>
+      </ul>
+
+      <h3>6. Propiedad de tus imágenes</h3>
+      <p>
+        Conservas la totalidad de los derechos sobre las imágenes que procesas. Dado que el Servicio
+        no accede a ellas en ningún momento, no reclamamos ni adquirimos ninguna licencia ni derecho
+        sobre tu contenido.
+      </p>
+
+      <h3>7. Propiedad intelectual del Servicio</h3>
+      <p>
+        El software, el diseño, la interfaz, los textos, los logotipos y la marca del Servicio están
+        protegidos por las leyes de propiedad intelectual. No se permite copiar, modificar,
+        distribuir ni explotar dichos elementos sin autorización previa, salvo en la medida en que lo
+        permita la ley.
+      </p>
+
+      <h3>8. Requisitos técnicos</h3>
+      <p>
+        El Servicio requiere un navegador compatible con WebGPU (por ejemplo, versiones recientes de
+        Chrome o Edge). Si tu navegador o dispositivo no es compatible, es posible que algunas
+        funciones no estén disponibles o no funcionen correctamente.
+      </p>
+
+      <h3>9. Disponibilidad del servicio</h3>
+      <p>
+        El Servicio se ofrece de forma gratuita y «tal cual». No garantizamos su disponibilidad
+        ininterrumpida y nos reservamos el derecho de modificar, suspender o discontinuar todo o
+        parte del Servicio en cualquier momento y sin previo aviso.
+      </p>
+
+      <h3>10. Exención de garantías</h3>
+      <p>
+        El Servicio se proporciona «tal cual» y «según disponibilidad», sin garantías de ningún tipo,
+        ya sean expresas o implícitas. No garantizamos que el resultado de la optimización satisfaga
+        tus expectativas, ni que el Servicio esté libre de errores o interrupciones.
+      </p>
+
+      <h3>11. Limitación de responsabilidad</h3>
+      <p>
+        En la máxima medida permitida por la legislación aplicable, no seremos responsables de ningún
+        daño directo, indirecto, incidental o consecuente derivado del uso o la imposibilidad de uso
+        del Servicio, incluida la eventual pérdida o alteración de imágenes.
+        <strong>Te recomendamos conservar siempre una copia de los archivos originales</strong> antes
+        de procesarlos.
+      </p>
+
+      <h3>12. Servicios de terceros</h3>
+      <p>
+        El Servicio se apoya en un proveedor de alojamiento para su distribución. El tratamiento de
+        los metadatos técnicos de conexión por parte de dicho proveedor se rige por sus propias
+        políticas y condiciones, ajenas a nuestro control.
+      </p>
+
+      <h3>13. Modificaciones de los términos</h3>
+      <p>
+        Podemos actualizar estos Términos y Condiciones en cualquier momento. La versión vigente será
+        siempre la publicada en el Servicio. El uso continuado del Servicio tras una modificación
+        implica la aceptación de los términos revisados.
+      </p>
+    </article>
+
+    <!-- Footer action -->
+    <footer class="px-5 sm:px-6 py-4 border-t border-(--border)">
+      <button
+        type="button"
+        (click)="close()"
+        class="w-full py-2.5 px-4 min-h-11 rounded-lg font-medium text-sm bg-(--primary) text-(--primary-foreground) transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ring) focus-visible:ring-offset-2 touch-manipulation"
+      >
+        Entendido
+      </button>
+    </footer>
+  }
+</dialog>

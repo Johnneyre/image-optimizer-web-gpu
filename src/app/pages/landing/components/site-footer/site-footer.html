@@ -13,9 +13,21 @@
       </div>
     </div>
 
-    <!-- Copyright -->
-    <p class="m-0 text-xs text-(--muted-foreground)">
-      © {{ currentYear }} WebGPU Image Optimizer. Todos los derechos reservados.
-    </p>
+    <!-- Links + Copyright -->
+    <div class="flex flex-col items-center gap-2 sm:items-end">
+      <button
+        type="button"
+        (click)="termsOpen.set(true)"
+        class="m-0 text-xs text-(--muted-foreground) bg-transparent border-0 cursor-pointer transition-colors hover:text-(--foreground) underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ring) rounded"
+      >
+        Términos y Condiciones
+      </button>
+      <p class="m-0 text-xs text-(--muted-foreground) text-center sm:text-right">
+        © {{ currentYear }} WebGPU Image Optimizer. Todos los derechos reservados.
+      </p>
+    </div>
   </div>
 </footer>
+
+<!-- Terms & Conditions Modal -->
+<app-terms-modal [open]="termsOpen()" (closed)="termsOpen.set(false)" />
