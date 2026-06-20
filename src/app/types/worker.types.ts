@@ -95,21 +95,8 @@ export interface ProcessResult {
   requestId: number;
 }
 
-export interface ErrorResult {
-  type: 'error';
-  message: string;
-  requestId?: number;
-}
-
-export interface CancelledResult {
-  type: 'cancelled';
-  requestId: number;
-}
-
 export interface InitResult {
   type: 'init-complete';
   supported: boolean;
   adapterInfo?: string;
 }
-
-export type WorkerResult = ProcessResult | ErrorResult | CancelledResult | InitResult;
