@@ -10,7 +10,6 @@ Comprime y optimiza imágenes **directamente en tu navegador** con WebGPU. Proce
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
 ![WebGPU](https://img.shields.io/badge/WebGPU-WGSL-005A9C?logo=webgpu&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
-![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)
 ![Vitest](https://img.shields.io/badge/tested_with-Vitest-6E9F18?logo=vitest&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
@@ -22,7 +21,7 @@ Comprime y optimiza imágenes **directamente en tu navegador** con WebGPU. Proce
 
 **WebGPU Image Optimizer** es una aplicación web que reduce el peso de tus imágenes sin sacrificar calidad perceptible. A diferencia de los compresores online tradicionales, el procesamiento ocurre por completo en tu dispositivo: la GPU aplica los ajustes mediante un _compute shader_ en WGSL y el resultado se codifica a WebP o JPEG dentro de un Web Worker.
 
-Como ningún archivo abandona el navegador, obtienes tres ventajas frente a una solución en servidor:
+Como ningún archivo abandona el navegador, obtienes ventajas frente a una solución en servidor:
 
 - **Privacidad total.** Tus imágenes nunca se suben a ningún servidor.
 - **Velocidad.** El cómputo en GPU procesa los píxeles en paralelo.
