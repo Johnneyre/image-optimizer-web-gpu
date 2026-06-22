@@ -51,18 +51,6 @@ El núcleo de la aplicación es `ImageProcessingService`, que orquesta un Web Wo
 - **Tema claro y oscuro** con detección de la preferencia del sistema.
 - **Detección de soporte** de WebGPU con mensaje claro cuando el navegador no es compatible.
 
-La optimización reparte el trabajo entre tres unidades de cómputo —el **hilo principal**, un **Web Worker** y la **GPU**— sin que tus datos salgan del navegador. Subes la imagen, el worker extrae sus píxeles, la GPU les aplica los ajustes en paralelo con un shader WGSL, el worker los codifica a WebP o JPEG y el hilo principal renderiza el comparador:
-
-![Infografía del flujo de optimización por WebGPU: subes una imagen en el hilo principal, el Web Worker extrae los píxeles, la GPU los procesa en paralelo con un shader WGSL, el worker los codifica a WebP o JPEG y el hilo principal renderiza el comparador antes/después.](public/how-it-works.png)
-
-El núcleo de la aplicación es `ImageProcessingService`, que orquesta un Web Worker dedicado (`image-processor.worker.ts`). El servicio expone el estado mediante _signals_ de Angular y aplica varias optimizaciones para mantener la interfaz fluida:
-
-- **Debounce de 300 ms** al mover los deslizadores, de modo que arrastrar un control no dispara un cómputo por cada píxel de movimiento.
-- **Cancelación de peticiones obsoletas** con `switchMap`, para que solo cuente el último ajuste.
-- **Caché de píxeles RGBA en el worker.** Si solo cambias la calidad o el formato de salida, el worker reutiliza los datos y vuelve a codificar sin re-ejecutar la GPU.
-- **Atajo para calidad máxima.** Cuando eliges calidad 100% sin ajustes de brillo o contraste, la aplicación usa el archivo original directamente.
-- **Gestión cuidadosa de las _blob URL_** para evitar fugas de memoria durante las transiciones.
-
 ## Requisitos previos
 
 - **Node.js** `^20.19.0`, `^22.12.0` o `^24.0.0` (lo exige Angular 21).
