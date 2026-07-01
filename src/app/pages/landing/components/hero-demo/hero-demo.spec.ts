@@ -73,9 +73,9 @@ describe('HeroDemoComponent', () => {
     const fixture = TestBed.createComponent(HeroDemoComponent);
     await fixture.whenStable();
 
-    // El callback de DestroyRef limpia el timeout de arranque sin lanzar.
+    // The DestroyRef callback clears the startup timeout without throwing.
     expect(() => fixture.destroy()).not.toThrow();
-    // Destruir de nuevo tampoco debe lanzar.
+    // Destroying again must not throw either.
     expect(() => fixture.destroy()).not.toThrow();
   });
 
@@ -85,9 +85,9 @@ describe('HeroDemoComponent', () => {
 
     const component = fixture.componentInstance;
 
-    // El arranque se programa ~1200ms tras el render. Esperamos la primera
-    // emisión con un límite; si afterNextRender no se dispara en el entorno de
-    // test, caemos al fallback y validamos el estado inicial estable.
+    // Startup is scheduled ~1200ms after render. We wait for the first emission
+    // with a timeout; if afterNextRender doesn't fire in the test environment,
+    // we fall back and validate the stable initial state.
     const firstStep = await new Promise<number | null>((resolve) => {
       let settled = false;
       let timer: ReturnType<typeof setTimeout> | undefined;

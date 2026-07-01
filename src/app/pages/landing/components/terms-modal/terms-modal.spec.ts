@@ -17,7 +17,7 @@ describe('TermsModalComponent', () => {
     return (fixture.nativeElement as HTMLElement).querySelector('dialog')!;
   }
 
-  // Abre el modal stubeando showModal (jsdom no implementa el top layer real).
+  // Opens the modal by stubbing showModal (jsdom doesn't implement the real top layer).
   async function openModal(): Promise<HTMLDialogElement> {
     const dialog = dialogEl();
     dialog.showModal = vi.fn(() => {
@@ -36,7 +36,7 @@ describe('TermsModalComponent', () => {
   it('keeps the legal content out of the DOM while closed', () => {
     const dialog = dialogEl();
     expect(dialog).not.toBeNull();
-    // El contenido se renderiza solo al abrir (mejor para SEO y DOM inicial).
+    // Content is rendered only on open (better for SEO and initial DOM).
     expect(dialog.querySelector('article')).toBeNull();
     expect(dialog.textContent?.trim()).toBe('');
   });
@@ -44,13 +44,13 @@ describe('TermsModalComponent', () => {
   it('renders accessible, self-contained content when opened', async () => {
     const dialog = await openModal();
 
-    // Etiqueta accesible asociada al encabezado visible
+    // Accessible label associated with the visible heading
     expect(dialog.getAttribute('aria-labelledby')).toBe('terms-title');
     expect(dialog.querySelector('#terms-title')?.textContent?.trim()).toBe(
       'Términos y Condiciones',
     );
 
-    // Contenido como documento autocontenido
+    // Content as a self-contained document
     const article = dialog.querySelector('article');
     expect(article).not.toBeNull();
 

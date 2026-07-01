@@ -1,7 +1,7 @@
 <div class="max-w-3xl mx-auto mt-8 sm:mt-14 grid grid-cols-3 gap-2 px-4 sm:gap-6 sm:px-6 lg:px-8">
   @for (stat of stats; track stat.label; let i = $index) {
     <div
-      class="rounded-xl border border-(--border)/40 bg-(--card)/50 text-center transition-all duration-200 ease hover:border-(--primary)/25 hover:bg-(--card)/70 p-3 sm:p-4 animate-[statFadeInFromTop_0.2s_ease-out_both]"
+      class="stat-card rounded-xl border border-(--border)/60 bg-(--card)/70 text-center transition-all duration-200 ease hover:border-(--primary)/30 hover:bg-(--card) p-3 sm:p-4 animate-[statFadeInFromTop_0.2s_ease-out_both]"
       [style.animation-delay]="'calc(0.2s + ' + i + ' * 0.1s)'"
     >
       <p

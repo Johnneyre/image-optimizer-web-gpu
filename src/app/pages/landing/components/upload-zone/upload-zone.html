@@ -66,14 +66,14 @@
   <!-- Warning -->
   @if (isSupported() === false) {
     <div
-      class="flex items-center gap-2 mt-4 py-2 px-4 rounded-lg bg-[oklch(0.55_0.2_25/0.1)] border border-[oklch(0.55_0.2_25/0.3)]"
+      class="flex items-center gap-2 mt-4 py-2 px-4 rounded-lg bg-(--warning)/10 border border-(--warning)/30"
     >
       <lucide-icon
         [img]="icons.CircleAlert"
         [size]="16"
-        class="text-[oklch(0.65_0.2_25)] shrink-0"
+        class="text-(--warning) shrink-0"
       />
-      <p class="m-0 text-[0.8rem] text-[oklch(0.65_0.2_25)]">
+      <p class="m-0 text-[0.8rem] text-(--warning)">
         Tu navegador no soporta WebGPU. Prueba con Chrome 113+ o Edge 113+.
       </p>
     </div>

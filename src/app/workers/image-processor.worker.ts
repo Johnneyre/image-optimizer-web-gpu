@@ -13,7 +13,7 @@ import type {
 } from '../types/worker.types';
 
 // ============================================================================
-// Shader WGSL - Brightness y Contrast
+// WGSL Shader - Brightness and Contrast
 // ============================================================================
 
 const IMAGE_PROCESSING_SHADER = /* wgsl */ `
@@ -63,24 +63,24 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 
   var color = pixel.rgb;
 
-  // 1. Brillo (aditivo)
+  // 1. Brightness (additive)
   color = color + vec3<f32>(params.brightness);
 
-  // 2. Contraste (centrado en 0.5)
+  // 2. Contrast (centered on 0.5)
   color = vec3<f32>(
     contrastCurve(color.r, params.contrast),
     contrastCurve(color.g, params.contrast),
     contrastCurve(color.b, params.contrast)
   );
 
-  // Clamp final y preservar alpha original
+  // Final clamp and preserve original alpha
   let result = vec4<f32>(clamp(color, vec3<f32>(0.0), vec3<f32>(1.0)), pixel.a);
   outputPixels[index] = packRGBA(result);
 }
 `;
 
 // ============================================================================
-// Estado Global
+// Global State
 // ============================================================================
 
 let device: GPUDevice | null = null;
@@ -93,10 +93,10 @@ let paramsBuffer: GPUBuffer | null = null;
 let currentRequestId = 0;
 let processingLock: Promise<void> = Promise.resolve();
 
-// Cache del último resultado RGBA para re-encoding sin GPU
+// Cache of the last RGBA result for re-encoding without GPU
 let rgbaCache: RgbaCache | null = null;
 
-// Canvas reutilizables: evitan asignar cientos de MB por operación con imágenes grandes
+// Reusable canvases: avoid allocating hundreds of MB per operation on large images
 let extractCanvas: OffscreenCanvas | null = null;
 let extractCtx: OffscreenCanvasRenderingContext2D | null = null;
 let encodeCanvas: OffscreenCanvas | null = null;
@@ -144,7 +144,7 @@ function releaseCaches(): void {
 }
 
 // ============================================================================
-// Inicialización WebGPU
+// WebGPU Initialization
 // ============================================================================
 
 async function initializeWebGPU(): Promise<InitResult> {
@@ -205,7 +205,7 @@ async function initializeWebGPU(): Promise<InitResult> {
 }
 
 // ============================================================================
-// Gestión de Buffers
+// Buffer Management
 // ============================================================================
 
 function ensureBuffers(pixelCount: number): BufferCache {
@@ -260,7 +260,7 @@ function ensureBuffers(pixelCount: number): BufferCache {
 }
 
 // ============================================================================
-// Encoding con OffscreenCanvas (ejecuta en Worker, no bloquea main thread)
+// Encoding with OffscreenCanvas (runs in the Worker, doesn't block the main thread)
 // ============================================================================
 
 async function encodeImage(
@@ -272,14 +272,14 @@ async function encodeImage(
 ): Promise<{ buffer: ArrayBuffer; mimeType: string; timeMs: number }> {
   const tStart = performance.now();
 
-  // Crear ImageData desde RGBA
+  // Create ImageData from RGBA
   const imageData = new ImageData(
     new Uint8ClampedArray(rgbaData.buffer as ArrayBuffer, rgbaData.byteOffset, rgbaData.byteLength),
     width,
     height,
   );
 
-  // Ajustar quality para evitar lossless bloat en 100%
+  // Clamp quality to avoid lossless bloat at 100%
   let finalQuality = quality;
   if (finalQuality >= 1) {
     finalQuality = 0.98;
@@ -300,7 +300,7 @@ async function encodeImage(
 }
 
 // ============================================================================
-// Procesamiento GPU + Encoding
+// GPU Processing + Encoding
 // ============================================================================
 
 async function processImage(message: ProcessImageMessage): Promise<ProcessResult | null> {
@@ -343,7 +343,7 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
   const pixelCount = width * height;
 
   try {
-    // Extraer píxeles
+    // Extract pixels
     const ctx = getExtractContext(width, height);
     ctx.drawImage(imageBitmap, 0, 0);
     const imageData = ctx.getImageData(0, 0, width, height);
@@ -356,10 +356,10 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
       throw new Error('GPU device lost during buffer setup');
     }
 
-    // Subir datos
+    // Upload data
     device.queue.writeBuffer(buffers.inputBuffer, 0, inputData);
 
-    // Parámetros
+    // Parameters
     const brightness = params.brightness ?? 0;
     const contrast = params.contrast ?? 1;
 
@@ -371,7 +371,7 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
     view.setFloat32(12, contrast, true);
     device.queue.writeBuffer(paramsBuffer, 0, paramsData);
 
-    // Ejecutar shader
+    // Run the shader
     const workgroupsX = Math.ceil(width / 16);
     const workgroupsY = Math.ceil(height / 16);
 
@@ -402,7 +402,7 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
       throw new Error('GPU device lost before readback');
     }
 
-    // Leer resultado
+    // Read result
     try {
       await buffers.stagingBuffer.mapAsync(GPUMapMode.READ);
     } catch (mapError) {
@@ -417,10 +417,10 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
 
     const gpuTimeMs = performance.now() - startTime;
 
-    // Cachear resultado RGBA para re-encoding
+    // Cache the RGBA result for re-encoding
     rgbaCache = { data: resultData, width, height };
 
-    // Encoding con OffscreenCanvas
+    // Encoding with OffscreenCanvas
     const {
       buffer: encodedBuffer,
       mimeType,
@@ -449,7 +449,7 @@ async function processImage(message: ProcessImageMessage): Promise<ProcessResult
 }
 
 // ============================================================================
-// Re-encoding (sin GPU, usa cache RGBA)
+// Re-encoding (no GPU, uses RGBA cache)
 // ============================================================================
 
 async function reEncode(message: EncodeMessage): Promise<ProcessResult | null> {
@@ -465,7 +465,7 @@ async function reEncode(message: EncodeMessage): Promise<ProcessResult | null> {
 
   const { data, width, height } = rgbaCache;
 
-  // Encoding con OffscreenCanvas
+  // Encoding with OffscreenCanvas
   const {
     buffer: encodedBuffer,
     mimeType,
@@ -485,8 +485,8 @@ async function reEncode(message: EncodeMessage): Promise<ProcessResult | null> {
   };
 }
 
-// Encode directo de un bitmap (sin GPU, sin tocar el cache RGBA)
-// Usado para convertir el archivo original a otro formato en la descarga
+// Direct encode of a bitmap (no GPU, doesn't touch the RGBA cache)
+// Used to convert the original file to another format on download
 async function encodeFile(message: EncodeFileMessage): Promise<ProcessResult> {
   const { imageBitmap, outputFormat, outputQuality, requestId } = message;
   const { width, height } = imageBitmap;
@@ -532,7 +532,7 @@ function cleanup(): void {
     paramsBuffer?.destroy();
     device?.destroy();
   } catch {
-    // Ignorar errores durante cleanup de recursos GPU
+    // Ignore errors during GPU resource cleanup
   }
 
   paramsBuffer = null;
@@ -563,7 +563,7 @@ globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         if (result) {
           self.postMessage(result, [result.blobData]);
         } else {
-          // Request descartada por una más reciente: responder siempre para que el main thread no deje promesas pendientes huérfanas
+          // Request superseded by a newer one: always reply so the main thread doesn't leave orphaned pending promises
           self.postMessage({ type: 'cancelled', requestId: message.requestId });
         }
         break;
@@ -581,7 +581,7 @@ globalThis.onmessage = async (event: MessageEvent<WorkerMessage>) => {
       }
 
       case 'encode-file': {
-        // Independiente del flujo de procesamiento: no toca currentRequestId
+        // Independent of the processing flow: doesn't touch currentRequestId
         const result = await encodeFile(message);
         self.postMessage(result, [result.blobData]);
         break;

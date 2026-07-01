@@ -5,12 +5,12 @@
   overflow: hidden;
 }
 
-/* Slider handle - línea delgada pero área de click amplia */
+/* Slider handle - thin line but wide click area */
 .slider-handle {
   cursor: ew-resize;
 }
 
-/* Área de click invisible más amplia */
+/* Wider invisible click area */
 .slider-handle::before {
   content: '';
   position: absolute;
@@ -20,7 +20,7 @@
   right: -12px;
 }
 
-/* Touch: franja de agarre más ancha (44px en total) */
+/* Touch: wider grab strip (44px total) */
 @media (max-width: 1024px) {
   .slider-handle::before {
     left: -20px;

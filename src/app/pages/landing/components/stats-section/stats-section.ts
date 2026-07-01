@@ -6,6 +6,7 @@ import type { Stat } from '@types';
   standalone: true,
   imports: [],
   templateUrl: './stats-section.html',
+  styleUrl: './stats-section.css',
 })
 export class StatsSectionComponent {
   readonly stats: Stat[] = [

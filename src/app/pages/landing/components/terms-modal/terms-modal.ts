@@ -22,7 +22,7 @@ export class TermsModalComponent {
   private readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('dialog');
 
   constructor() {
-    // Sincroniza el <dialog> nativo con el input `open`.
+    // Syncs the native <dialog> with the `open` input.
     effect((onCleanup) => {
       const dialog = this.dialog()?.nativeElement;
       if (!dialog) return;
@@ -43,7 +43,7 @@ export class TermsModalComponent {
     this.closed.emit();
   }
 
-  // Escape (evento `cancel` nativo): el estado lo controla el padre vía `open`.
+  // Escape (native `cancel` event): the parent controls the state via `open`.
   onCancel(event: Event): void {
     event.preventDefault();
     this.close();

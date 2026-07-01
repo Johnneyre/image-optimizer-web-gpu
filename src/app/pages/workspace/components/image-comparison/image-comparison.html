@@ -81,13 +81,13 @@
       </div>
     }
 
-    <!-- Original Image (recortado por el slider) -->
+    <!-- Original Image (clipped by the slider) -->
     @if (originalImageUrl() && containerWidth() > 0) {
       <div
         class="absolute top-0 bottom-0 left-0 overflow-hidden pointer-events-none"
         [style.width.%]="sliderPosition()"
       >
-        <!-- Contenedor interior con el mismo tamaño que el padre completo -->
+        <!-- Inner container matching the full parent size -->
         <div
           class="absolute top-0 bottom-0 left-0 flex items-center justify-center"
           [style.width.px]="containerWidth()"
@@ -133,8 +133,8 @@
       <!-- Labels -->
       <div
         [class]="
-          (theme() === 'dark' ? 'bg-slate-900/80' : 'bg-white/80') +
-          ' absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium px-2 py-1 rounded backdrop-blur-sm'
+          (theme() === 'dark' ? 'bg-slate-900/85' : 'bg-white/90') +
+          ' absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-medium px-2 py-1 rounded shadow-md backdrop-blur-sm'
         "
         [style.top.px]="16"
       >
@@ -142,7 +142,7 @@
         <span class="mx-1" [class]="theme() === 'dark' ? 'text-slate-600' : 'text-slate-300'"
           >|</span
         >
-        <span class="text-cyan-500">Procesada</span>
+        <span class="font-semibold text-(--primary)">Procesada</span>
       </div>
     </div>
 

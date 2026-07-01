@@ -24,7 +24,7 @@ export class ImageProcessingService implements OnDestroy {
     useOriginal: boolean;
   }>();
 
-  // Signals públicos
+  // Public signals
   readonly isSupported = signal<boolean | null>(null);
   readonly isInitializing = signal(true);
   readonly isProcessing = signal(false);
@@ -37,18 +37,18 @@ export class ImageProcessingService implements OnDestroy {
   readonly processingTimeMs = signal<number>(0);
   readonly processedBlobSize = signal<number>(0);
 
-  // Formato de salida seleccionado
+  // Selected output format
   readonly outputFormat = signal<DownloadFormat>('image/webp');
 
-  // Parámetros de imagen usados en el último procesamiento GPU
+  // Image params used in the last GPU processing
   private lastGpuParams: { brightness: number; contrast: number } | null = null;
   // Track if worker has cached RGBA data
   private workerHasCache = false;
-  // URL procesada anterior: sigue visible como capa base durante el fade-in,
-  // así que se revoca recién cuando llega el siguiente resultado
+  // Previous processed URL: stays visible as the base layer during the fade-in,
+  // so it's revoked only when the next result arrives
   private staleProcessedUrl: string | null = null;
 
-  // Parámetros reactivos
+  // Reactive params
   readonly quality = signal(80);
   readonly brightness = signal(0);
   readonly contrast = signal(1);
@@ -104,20 +104,20 @@ export class ImageProcessingService implements OnDestroy {
 
       if (file && isReady) {
         untracked(() => {
-          // CASO ESPECIAL: quality=100% sin ajustes → usar archivo original.
-          // Pasa por el mismo pipeline para que el debounce descarte requests
-          // intermedias (p.ej. quality=99 al arrastrar el slider hasta 100).
+          // SPECIAL CASE: quality=100% with no adjustments → use the original file.
+          // Goes through the same pipeline so the debounce drops intermediate
+          // requests (e.g. quality=99 while dragging the slider up to 100).
           const useOriginal = params.quality === 100 && !hasAdjustments;
 
-          // Detectar si necesitamos GPU o solo re-encoding
+          // Detect whether we need GPU or just re-encoding
           const gpuParamsChanged =
             this.lastGpuParams?.brightness !== params.brightness ||
             this.lastGpuParams.contrast !== params.contrast;
 
           const needsGpu = gpuParamsChanged || !this.workerHasCache;
 
-          // isProcessing se activa en processInternal, después del debounce:
-          // mover un slider no muestra "Procesando" hasta que el trabajo real empieza
+          // isProcessing is set in processInternal, after the debounce:
+          // moving a slider doesn't show "Procesando" until the real work starts
           this.processRequest$.next({ file, params, needsGpu, useOriginal });
         });
       }
@@ -163,8 +163,8 @@ export class ImageProcessingService implements OnDestroy {
     this.processingTimeMs.set(0);
   }
 
-  // Revoca la URL procesada de hace dos resultados y marca la actual como "stale".
-  // La actual no se revoca aún porque el visor la mantiene como capa base del fade-in.
+  // Revokes the processed URL from two results ago and marks the current one as "stale".
+  // The current one isn't revoked yet because the viewer keeps it as the fade-in base layer.
   private rotateStaleProcessedUrl(): void {
     if (this.staleProcessedUrl?.startsWith('blob:')) {
       URL.revokeObjectURL(this.staleProcessedUrl);
@@ -267,7 +267,7 @@ export class ImageProcessingService implements OnDestroy {
   private updateFromWorkerResult(result: WorkerProcessResult): void {
     this.rotateStaleProcessedUrl();
 
-    // Crear blob desde ArrayBuffer recibido del worker
+    // Build a blob from the ArrayBuffer received from the worker
     const blob = new Blob([result.blobData], { type: result.blobType });
     const url = URL.createObjectURL(blob);
 
@@ -338,7 +338,7 @@ export class ImageProcessingService implements OnDestroy {
     }
   }
 
-  // API Pública
+  // Public API
   async setFile(file: File): Promise<void> {
     this.clearFile();
 
@@ -390,7 +390,7 @@ export class ImageProcessingService implements OnDestroy {
 
     this.cancelAllRequests();
 
-    // Liberar el cache RGBA y los buffers GPU retenidos en el worker
+    // Release the RGBA cache and GPU buffers held by the worker
     this.worker?.postMessage({ type: 'clear-cache' });
 
     this.currentFile.set(null);
@@ -402,7 +402,7 @@ export class ImageProcessingService implements OnDestroy {
     this.lastGpuParams = null;
     this.workerHasCache = false;
 
-    // Resetear ajustes a valores por defecto
+    // Reset adjustments to defaults
     this.quality.set(80);
     this.brightness.set(0);
     this.contrast.set(1);
@@ -413,15 +413,15 @@ export class ImageProcessingService implements OnDestroy {
     format: DownloadFormat = 'image/webp',
     quality: number = 0.85,
   ): Promise<Blob> {
-    // Si estamos usando el archivo original (quality=100% sin ajustes)
+    // If we're using the original file (quality=100% with no adjustments)
     const file = this.currentFile();
     if (!this.workerHasCache && file && this.worker) {
-      // El formato del archivo ya coincide con el solicitado: descargar tal cual
+      // The file format already matches the requested one: download as-is
       if (file.type === format) {
         return file;
       }
 
-      // Formato distinto: convertir el original en el worker (sin GPU)
+      // Different format: convert the original in the worker (no GPU)
       const imageBitmap = await createImageBitmap(file);
       return this.requestWorkerBlob(
         { type: 'encode-file', imageBitmap, outputFormat: format, outputQuality: quality },
@@ -429,7 +429,7 @@ export class ImageProcessingService implements OnDestroy {
       );
     }
 
-    // Si hay cache en el worker, pedir re-encode con los parámetros de descarga
+    // If the worker has a cache, request a re-encode with the download params
     if (this.workerHasCache && this.worker) {
       return this.requestWorkerBlob({
         type: 'encode',
@@ -441,8 +441,8 @@ export class ImageProcessingService implements OnDestroy {
     throw new Error('No hay imagen procesada');
   }
 
-  // Envía un mensaje de encoding al worker con un listener efímero que resuelve
-  // con el blob resultante (independiente del pipeline reactivo de pendingRequests)
+  // Sends an encoding message to the worker with an ephemeral listener that resolves
+  // with the resulting blob (independent of the reactive pendingRequests pipeline)
   private requestWorkerBlob(
     message: Record<string, unknown>,
     transfer: Transferable[] = [],

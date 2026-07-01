@@ -7,23 +7,23 @@ import {
   type ActivatedRouteSnapshot,
 } from '@angular/router';
 
-/** Origen canónico del sitio. Centralizado para canonical, og:url y sitemap. */
+/** Canonical origin of the site. Centralized for canonical, og:url and sitemap. */
 export const SITE_URL = 'https://webgpu-image-optimizer.com';
 
-/** Metadatos SEO asociados a una ruta mediante `data`. */
+/** SEO metadata attached to a route via `data`. */
 export interface SeoRouteData {
-  /** Meta description específica de la ruta. */
+  /** Route-specific meta description. */
   description?: string;
-  /** Ruta canónica relativa (p.ej. "/"); por defecto se usa la URL navegada. */
+  /** Relative canonical path (e.g. "/"); defaults to the navigated URL. */
   canonicalPath?: string;
-  /** Marca la ruta como no indexable (robots: noindex). */
+  /** Marks the route as non-indexable (robots: noindex). */
   noindex?: boolean;
 }
 
 /**
- * Estrategia de título personalizada que, además del `<title>`, mantiene
- * sincronizados la meta description, el canonical y las etiquetas Open Graph /
- * Twitter en cada navegación. Se registra como `TitleStrategy` en `app.config`.
+ * Custom title strategy that, besides the `<title>`, keeps the meta
+ * description, the canonical and the Open Graph / Twitter tags in sync on
+ * every navigation. Registered as `TitleStrategy` in `app.config`.
  */
 @Injectable({ providedIn: 'root' })
 export class SeoTitleStrategy extends TitleStrategy {
@@ -60,7 +60,7 @@ export class SeoTitleStrategy extends TitleStrategy {
     this.meta.updateTag({ property: 'og:url', content: url });
   }
 
-  /** Recorre el árbol de rutas y devuelve el `data` SEO más profundo definido. */
+  /** Walks the route tree and returns the deepest defined SEO `data`. */
   private deepestData(route: ActivatedRouteSnapshot): SeoRouteData | undefined {
     let current: ActivatedRouteSnapshot | null = route;
     let data: SeoRouteData | undefined;
@@ -73,7 +73,7 @@ export class SeoTitleStrategy extends TitleStrategy {
     return data;
   }
 
-  /** Crea o actualiza el `<link rel="canonical">` del documento. */
+  /** Creates or updates the document's `<link rel="canonical">`. */
   private setCanonicalUrl(url: string): void {
     let link = this.document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!link) {

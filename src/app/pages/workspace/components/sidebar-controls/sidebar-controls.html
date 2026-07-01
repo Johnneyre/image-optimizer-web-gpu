@@ -162,20 +162,26 @@
               <button
                 [class]="
                   (selectedPreset() === preset.value
-                    ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500'
-                    : theme() === 'dark'
-                      ? 'bg-slate-800 border-slate-700 hover:border-slate-600'
-                      : 'bg-slate-50 border-slate-200 hover:border-slate-300') +
+                    ? 'bg-(--primary) border-(--primary) shadow-sm'
+                    : 'bg-(--secondary) border-(--border) hover:border-(--primary)/45') +
                   ' px-1 py-2 lg:p-2 min-h-11 rounded-lg border text-center transition-all touch-manipulation'
                 "
                 [disabled]="shouldBlockControls()"
                 (click)="onSelectPreset(preset.value)"
               >
-                <span class="text-sm font-medium">{{ preset.label }}</span>
                 <span
+                  class="text-sm font-semibold"
                   [class]="
-                    (theme() === 'dark' ? 'text-slate-500' : 'text-slate-400') +
-                    ' block text-xs mt-0.5'
+                    selectedPreset() === preset.value ? 'text-(--primary-foreground)' : 'text-(--foreground)'
+                  "
+                  >{{ preset.label }}</span
+                >
+                <span
+                  class="block text-xs mt-0.5"
+                  [class]="
+                    selectedPreset() === preset.value
+                      ? 'text-(--primary-foreground)/85'
+                      : 'text-(--muted-foreground)'
                   "
                 >
                   {{ preset.description }}
@@ -189,7 +195,7 @@
         <div>
           <div class="flex items-center justify-between mb-2">
             <label class="text-sm font-medium">Calidad Manual</label>
-            <span class="text-sm font-mono text-cyan-500">{{ quality() }}%</span>
+            <span class="text-sm font-mono text-(--primary)">{{ quality() }}%</span>
           </div>
           <input
             type="range"
@@ -305,11 +311,9 @@
             <button
               [class]="
                 (selectedFormat() === fmt.value
-                  ? 'bg-cyan-500/20 border-cyan-500 text-cyan-500'
-                  : theme() === 'dark'
-                    ? 'bg-slate-800 border-slate-700 hover:border-slate-600'
-                    : 'bg-slate-50 border-slate-200 hover:border-slate-300') +
-                ' p-2 min-h-11 rounded-lg border text-center transition-all text-sm font-medium touch-manipulation'
+                  ? 'bg-(--primary) border-(--primary) text-(--primary-foreground) font-semibold shadow-sm'
+                  : 'bg-(--secondary) border-(--border) text-(--foreground) hover:border-(--primary)/45 font-medium') +
+                ' p-2 min-h-11 rounded-lg border text-center transition-all text-sm touch-manipulation'
               "
               [disabled]="shouldBlockControls()"
               (click)="onFormatChange(fmt.value)"

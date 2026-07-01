@@ -34,7 +34,8 @@
   overflow: hidden;
   border-radius: 1rem;
   border: 2px dashed var(--border);
-  background: oklch(from var(--card) l c h / 0.6);
+  background: oklch(from var(--card) l c h / 0.7);
+  box-shadow: var(--shadow-md);
   backdrop-filter: blur(4px);
   padding: 3.5rem 1.5rem;
   cursor: pointer;
@@ -49,7 +50,8 @@
 
 .upload-zone:hover {
   border-color: oklch(from var(--primary) l c h / 0.5);
-  background: oklch(from var(--card) l c h / 0.8);
+  background: oklch(from var(--card) l c h / 0.9);
+  box-shadow: var(--shadow-lg);
 }
 
 .upload-zone:focus-visible {

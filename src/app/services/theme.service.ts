@@ -10,7 +10,7 @@ export class ThemeService {
   readonly theme = signal<Theme>('dark');
 
   constructor() {
-    // matchMedia puede no existir en entornos sin implementación completa de DOM (p.ej. jsdom)
+    // matchMedia may not exist in environments without a full DOM implementation (e.g. jsdom)
     if (this.isBrowser && typeof globalThis.matchMedia === 'function') {
       // Load saved theme or detect system preference
       const savedTheme = localStorage.getItem('theme') as Theme | null;

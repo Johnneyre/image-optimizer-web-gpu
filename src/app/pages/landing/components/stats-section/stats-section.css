@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+/* Token shadow applied in plain CSS: Tailwind v4's shadow-* utility
+   doesn't recompose multi-layer oklch shadow variables. */
+.stat-card {
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+}

@@ -14,7 +14,10 @@
       </div>
 
       <div class="mt-8 text-center">
-        <p class="text-lg font-semibold bg-linear-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">
+        <p
+          class="text-lg font-semibold bg-clip-text text-transparent bg-linear-to-r"
+          [class]="theme() === 'dark' ? 'from-cyan-400 to-indigo-400' : 'from-cyan-600 to-indigo-600'"
+        >
           Generando imagen optimizada...
         </p>
         <p class="text-sm mt-2" [class]="theme() === 'dark' ? 'text-slate-400' : 'text-slate-500'">
